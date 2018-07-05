@@ -136,10 +136,19 @@ register() {
 
 get() {
 
-  # オプション無しで呼ばれた場合、サービス名を尋ねる
+  # オプション無しで呼ばれた場合、サービス名の入力を受け付ける
   if [ -z "$*" ]; then
-    printf %s 'Enter the service name: '
-    read service_name
+
+    # peco がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
+    if command -v peco 1>/dev/null; then
+      service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | peco)
+    else
+      cat "$SIGN_CONFIG_DIR/service_names"
+
+      printf %s 'Enter the service name: '
+      read service_name
+    fi
+
   else
     service_name=$1
     shift
@@ -153,10 +162,19 @@ get() {
     exit 71
   fi
 
-  # 1オプションで呼ばれた場合、 ID を尋ねる
+  # 1オプションで呼ばれた場合、 ID の入力を受け付ける
   if [ -z "$*" ]; then
-    printf %s "Enter an ID of yours for $service_name: "
-    read your_id
+
+    # peco がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
+    if command -v peco 1>/dev/null; then
+      your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | peco)
+    else
+      cat "$SIGN_CONFIG_DIR/${service_name}_ids"
+
+      printf %s "Enter an ID of yours for $service_name: "
+      read your_id
+    fi
+
   else
     your_id=$1
     shift

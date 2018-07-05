@@ -132,6 +132,7 @@ register() {
   echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
 
   hash_and_then_copy "$service_name" "$your_id"
+  echo_info 'Your password is stored into the clipboard.'
 }
 
 get() {
@@ -189,7 +190,11 @@ get() {
     exit 72
   fi
 
+  echo "$your_id" | xsel -bi
+  echo_info 'Your ID is stored into the clipboard.'
+
   hash_and_then_copy "$service_name" "$your_id"
+  echo_info 'Your password is stored into the clipboard.'
 }
 
 #
@@ -248,6 +253,13 @@ hmac_sha256() {
   printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
 }
 
+#
+# echo_info <string> ..
+#
+echo_info() {
+  print_colored 0 255 255 "[INFO]   $@"
+  echo
+}
 
 #
 # echo_fatal <string> ..

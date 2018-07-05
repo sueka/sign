@@ -81,7 +81,7 @@ init() {
   touch "$SIGN_CONFIG_DIR/passphrase"
   chmod 600 "$SIGN_CONFIG_DIR/passphrase"
 
-  echo $(hmac_sha256 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
+  echo $(hmac_sha384 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
 }
 
 register() {
@@ -219,7 +219,7 @@ hash_and_then_copy() {
   stty echo
 
   # passphrase が誤っている場合、 70 で終了する
-  if [ $(hmac_sha256 "$passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+  if [ $(hmac_sha384 "$passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
     echo_fatal 'Passphrase is wrong.' >&2
     exit 70
   fi
@@ -230,13 +230,13 @@ hash_and_then_copy() {
   your_id=$1
   shift
 
-  hmac_sha256 "$service_name $your_id" "$passphrase" | xsel -bi
+  hmac_sha384 "$service_name $your_id" "$passphrase" | xsel -bi
 }
 
 #
-# hmac_sha256 <message> <secret key>
+# hmac_sha384 <message> <secret key>
 #
-hmac_sha256() {
+hmac_sha384() {
 
   # openssl が無い場合、 66 で終了する
   if ! command -v openssl 1>/dev/null; then
@@ -250,7 +250,7 @@ hmac_sha256() {
   secret_key=$1
   shift
 
-  printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
+  printf %s $(printf %s "$message" | openssl dgst -sha384 -hmac "$secret_key" | sed 's/^.* //')
 }
 
 #

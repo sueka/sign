@@ -78,11 +78,19 @@ init() {
   mkdir -p "$SIGN_CONFIG_DIR"
   chmod 700 "$SIGN_CONFIG_DIR"
 
-  echo $(hmac_sha256 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
+  touch "$SIGN_CONFIG_DIR/passphrase"
   chmod 600 "$SIGN_CONFIG_DIR/passphrase"
+
+  echo $(hmac_sha256 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
 }
 
 register() {
+
+  # サービス名一覧が存在しない場合、作成する
+  if ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
+    touch "$SIGN_CONFIG_DIR/service_names"
+    chmod 755 "$SIGN_CONFIG_DIR/service_names"
+  fi
 
   # オプション無しで呼ばれた場合、サービス名を尋ねる
   if [ -z "$*" ]; then
@@ -93,15 +101,15 @@ register() {
     shift
   fi
 
-  # 指定されたサービスの ID 一覧が存在しない場合、作成する
-  if ! [ -f "$SIGN_CONFIG_DIR/${service_name}_ids" ]; then
+  # 指定されたサービス名がサービス名一覧に存在しない場合、作成する
+  if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
 
-    # TODO
-    if ! confirm "Do you want to create '$SIGN_CONFIG_DIR/${service_name}_ids' ?"; then
-      exit 74
-    fi
+    # TODO: 似たサービス名を表示させる
+
+    echo "$service_name" >>"$SIGN_CONFIG_DIR/service_names"
 
     touch "$SIGN_CONFIG_DIR/${service_name}_ids"
+    chmod 644 "$SIGN_CONFIG_DIR/${service_name}_ids"
   fi
 
   # 1オプションで呼ばれた場合、 ID を尋ねる
@@ -119,10 +127,7 @@ register() {
     exit 77
   fi
 
-  # TODO
-  if ! confirm "Do you want to append '$your_id' to '$SIGN_CONFIG_DIR/${service_name}_ids' ?"; then
-    exit 75
-  fi
+  # TODO: 似た ID を表示させる
 
   echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
 
@@ -140,8 +145,11 @@ get() {
     shift
   fi
 
-  # 指定されたサービスの ID 一覧が存在しない場合、 71 で終了する
-  if ! [ -f "$SIGN_CONFIG_DIR/${service_name}_ids" ]; then
+  # 指定されたサービス名がサービス一覧に存在しない場合、 71 で終了する
+  if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
+
+    # TODO: 似たサービス名を表示させる
+
     exit 71
   fi
 
@@ -156,6 +164,9 @@ get() {
 
   # ID が存在しない場合、 72 で終了する
   if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
+
+    # TODO: 似た ID を表示させる
+
     exit 72
   fi
 
@@ -216,33 +227,6 @@ hmac_sha256() {
   shift
 
   printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
-}
-
-#
-# confirm <prompt>
-#
-confirm() {
-  prompt=$1
-  shift
-
-  printf %s "$prompt [Y/n] "
-  read yes_no
-
-  case "$yes_no" in
-    '' | Y | YES | Yes | y | yes )
-      return 0
-    ;;
-
-    N | NO | No | n | no )
-      return 1
-    ;;
-
-    # yes/no 以外が入力された場合、 76 で終了する
-    * )
-      echo "Type 'yes' or 'no'." >&2
-      exit 76
-    ;;
-  esac
 }
 
 main "$@"

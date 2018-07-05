@@ -113,16 +113,18 @@ register() {
     shift
   fi
 
-  # ID が存在しない場合、作成する
-  if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
-
-    # TODO
-    if ! confirm "Do you want to append '$your_id' to '$SIGN_CONFIG_DIR/${service_name}_ids' ?"; then
-      exit 75
-    fi
-
-    echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
+  # ID がすでに存在する場合、 77 で終了する
+  if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
+    echo "'$your_id' for $service_name does already exist." >&2
+    exit 77
   fi
+
+  # TODO
+  if ! confirm "Do you want to append '$your_id' to '$SIGN_CONFIG_DIR/${service_name}_ids' ?"; then
+    exit 75
+  fi
+
+  echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
 
   hash_and_then_copy "$service_name" "$your_id"
 }

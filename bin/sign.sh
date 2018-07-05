@@ -230,7 +230,25 @@ hash_and_then_copy() {
   your_id=$1
   shift
 
-  hmac_sha384 "$service_name $your_id" "$passphrase" | xsel -bi
+  hash=$(hex_to_printable_ascii "$(hmac_sha384 "$service_name $your_id" "$passphrase")")
+  printf %s "$hash" | xsel -bi
+}
+
+#
+# hex_to_printable_ascii <hex>
+#
+hex_to_printable_ascii() {
+
+  # xxd が無い場合、 78 で終了する
+  if ! command -v xxd 1>/dev/null; then
+    echo_fatal "No command 'xxd' found." >&2
+    exit 78
+  fi
+
+  hex=$1
+  shift
+
+  printf %s "$hex" | xxd -r -p | strings -n1 | tr -d '\n'
 }
 
 #

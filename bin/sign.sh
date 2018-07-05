@@ -36,7 +36,7 @@ main() {
 
     # サブコマンドが存在しない場合、 65 で終了する
     * )
-      echo "No subcommand '$subcommand' found." >&2
+      echo_fatal "No subcommand '$subcommand' found." >&2
       exit 65
     ;;
   esac
@@ -51,7 +51,7 @@ init() {
 
   # $SIGN_CONFIG_DIR が存在する場合、 68 で終了する
   if [ -d "$SIGN_CONFIG_DIR" ]; then
-    echo "'$SIGN_CONFIG_DIR' does already exist." >&2
+    echo_fatal "'$SIGN_CONFIG_DIR' does already exist." >&2
     exit 68
   fi
 
@@ -71,7 +71,7 @@ init() {
 
   # passphrase と passphrase_again が異なる場合、 69 で終了する
   if [ "$passphrase" != "$passphrase_again" ]; then
-    echo 'Passphrases do not match each other.' >&2
+    echo_fatal 'Passphrases do not match each other.' >&2
     exit 69
   fi
 
@@ -123,7 +123,7 @@ register() {
 
   # ID がすでに存在する場合、 77 で終了する
   if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
-    echo "'$your_id' for $service_name does already exist." >&2
+    echo_fatal "'$your_id' for $service_name does already exist." >&2
     exit 77
   fi
 
@@ -198,7 +198,7 @@ hash_and_then_copy() {
 
   # xsel が無い場合、 73 で終了する
   if ! command -v xsel 1>/dev/null; then
-    echo "No command 'xsel' found." >&2
+    echo_fatal "No command 'xsel' found." >&2
     exit 73
   fi
 
@@ -214,7 +214,7 @@ hash_and_then_copy() {
 
   # passphrase が誤っている場合、 70 で終了する
   if [ $(hmac_sha256 "$passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
-    echo 'Passphrase is wrong.' >&2
+    echo_fatal 'Passphrase is wrong.' >&2
     exit 70
   fi
 
@@ -234,7 +234,7 @@ hmac_sha256() {
 
   # openssl が無い場合、 66 で終了する
   if ! command -v openssl 1>/dev/null; then
-    echo "No command 'openssl' found." >&2
+    echo_fatal "No command 'openssl' found." >&2
     exit 66
   fi
 
@@ -245,6 +245,33 @@ hmac_sha256() {
   shift
 
   printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
+}
+
+
+#
+# echo_fatal <string> ..
+#
+echo_fatal() {
+  print_colored 255 0 0 "[FATAL]  $@"
+  echo
+}
+
+#
+# print_colored <red> <green> <blue> <string> ..
+#
+print_colored() {
+  red=$1
+  shift
+
+  green=$1
+  shift
+
+  blue=$1
+  shift
+
+  printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
+  printf %s "$@"
+  printf '\e[0m'
 }
 
 main "$@"

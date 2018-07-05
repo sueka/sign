@@ -13,6 +13,15 @@ git clone --depth=1 https://github.com/sueka/sign.git /opt/local/sign
 sudo ln -s /opt/local/sign/bin/sign.sh /usr/local/bin/sign
 ```
 
+## Usage
+
+### Dependencies
+
+- `openssl`
+- `xsel`
+- `xxd`
+- `peco` (arbitrary)
+
 ## License
 
 [CC0 1.0 Universal](./LICENSE.txt)

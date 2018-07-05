@@ -185,6 +185,7 @@ get() {
 
     # TODO: 似た ID を表示させる
 
+    echo_fatal "No $service_name ID '$your_id' found." >&2
     exit 72
   fi
 

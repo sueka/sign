@@ -14,8 +14,7 @@ main() {
     exit 64
   fi
 
-  subcommand=$1
-  shift
+  subcommand=$1 && shift
 
   case "$subcommand" in
     init )
@@ -99,8 +98,7 @@ register() {
     printf %s 'Enter the service name: '
     read service_name
   else
-    service_name=$1
-    shift
+    service_name=$1 && shift
   fi
 
   # 指定されたサービス名がサービス名一覧に存在しない場合、作成する
@@ -119,8 +117,7 @@ register() {
     printf %s "Enter an ID of yours for $service_name: "
     read your_id
   else
-    your_id=$1
-    shift
+    your_id=$1 && shift
   fi
 
   # ID がすでに存在する場合、 77 で終了する
@@ -154,10 +151,8 @@ get() {
       printf %s 'Enter the service name: '
       read service_name
     fi
-
   else
-    service_name=$1
-    shift
+    service_name=$1 && shift
   fi
 
   # 指定されたサービス名がサービス一覧に存在しない場合、 71 で終了する
@@ -180,10 +175,8 @@ get() {
       printf %s "Enter an ID of yours for $service_name: "
       read your_id
     fi
-
   else
-    your_id=$1
-    shift
+    your_id=$1 && shift
   fi
 
   # ID が存在しない場合、 72 で終了する
@@ -229,11 +222,8 @@ hash_and_then_copy() {
     exit 70
   fi
 
-  service_name=$1
-  shift
-
-  your_id=$1
-  shift
+  service_name=$1 && shift
+  your_id=$1 && shift
 
   hash=$(hex_to_printable_ascii "$(hmac_sha384 "$service_name $your_id" "$passphrase")")
   printf %s "$hash" | xsel -bi
@@ -250,8 +240,7 @@ hex_to_printable_ascii() {
     exit 78
   fi
 
-  hex=$1
-  shift
+  hex=$1 && shift
 
   printf %s "$hex" | xxd -r -p | strings -n1 | tr -d '\n'
 }
@@ -267,11 +256,8 @@ hmac_sha384() {
     exit 66
   fi
 
-  message=$1
-  shift
-
-  secret_key=$1
-  shift
+  message=$1 && shift
+  secret_key=$1 && shift
 
   printf %s $(printf %s "$message" | openssl dgst -sha384 -hmac "$secret_key" | sed 's/^.* //')
 }
@@ -296,14 +282,9 @@ echo_fatal() {
 # print_colored <red> <green> <blue> <string> ..
 #
 print_colored() {
-  red=$1
-  shift
-
-  green=$1
-  shift
-
-  blue=$1
-  shift
+  red=$1 && shift
+  green=$1 && shift
+  blue=$1 && shift
 
   printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
   printf %s "$@"

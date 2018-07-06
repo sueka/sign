@@ -4,12 +4,8 @@ SIGN_CONFIG_DIR="$HOME/.sign"
 
 #
 # main init
-# main register
-# main register GitLab
-# main register GitLab sueka
-# main get
-# main get GitLab
-# main get GitLab sueka
+# main register [<service name> [<your ID>]]
+# main get [<service name> [<your ID>]]
 #
 main() {
 
@@ -42,6 +38,9 @@ main() {
   esac
 }
 
+#
+# init
+#
 init() {
 
   # オプション付きで呼ばれた場合、 67 で終了する
@@ -84,6 +83,9 @@ init() {
   echo $(hmac_sha384 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
 }
 
+#
+# register [<service name> [<your ID>]]
+#
 register() {
 
   # サービス名一覧が存在しない場合、作成する
@@ -135,6 +137,9 @@ register() {
   echo_info 'Your password is stored into the clipboard.'
 }
 
+#
+# get [<service name> [<your ID>]]
+#
 get() {
 
   # オプション無しで呼ばれた場合、サービス名の入力を受け付ける

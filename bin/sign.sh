@@ -142,9 +142,11 @@ get() {
   # オプション無しで呼ばれた場合、サービス名の入力を受け付ける
   if [ -z "$*" ]; then
 
-    # peco がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
+    # peco または percol がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
     if command -v peco 1>/dev/null; then
       service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | peco)
+    elif command -v percol 1>/dev/null; then
+      service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | percol)
     else
       cat "$SIGN_CONFIG_DIR/service_names"
 

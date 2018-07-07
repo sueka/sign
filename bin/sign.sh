@@ -266,7 +266,7 @@ hexadecimal_to_duohexagesimal() {
 }
 
 #
-# bc_with_no_linefeeds
+# bc_with_no_linefeeds [-l] [<file> ..]
 #
 bc_with_no_linefeeds() {
   while read line
@@ -293,7 +293,7 @@ hmac_sha384() {
 }
 
 #
-# echo_info <string> ..
+# echo_info [<string> ..]
 #
 echo_info() {
   print_colored 0 255 255 "[INFO]   $@"
@@ -301,7 +301,7 @@ echo_info() {
 }
 
 #
-# echo_fatal <string> ..
+# echo_fatal [<string> ..]
 #
 echo_fatal() {
   print_colored 255 0 0 "[FATAL]  $@"
@@ -309,7 +309,7 @@ echo_fatal() {
 }
 
 #
-# print_colored <red> <green> <blue> <string> ..
+# print_colored <red> <green> <blue> [<string> ..]
 #
 print_colored() {
   red=$1 && shift

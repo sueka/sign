@@ -248,12 +248,11 @@ hexadecimal_to_duohexagesimal() {
   hex=$1 && shift
 
   dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc)
-  duo=$(echo 'obase=62;' "$dec" | bc | tr -d '\\\n')
 
-  for i in $duo
+  duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc | tr -d '\\\n' | tr ' ' '\n' | bc)
+
+  for i in $duohexagesimal_digits
   do
-    i=$(echo "$i" | bc)
-
     if [ 0 -le "$i" -a "$i" -le 9 ]; then
       printf %d "$i"
     elif [ 10 -le "$i" -a "$i" -le 35 ]; then

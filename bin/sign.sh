@@ -178,9 +178,11 @@ get() {
   # 1オプションで呼ばれた場合、 ID の入力を受け付ける
   if [ -z "$*" ]; then
 
-    # peco がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
+    # peco または percol がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
     if command -v peco 1>/dev/null; then
       your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | peco)
+    if command -v percol 1>/dev/null; then
+      your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | percol)
     else
       cat "$SIGN_CONFIG_DIR/${service_name}_ids"
 

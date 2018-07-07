@@ -148,7 +148,17 @@ get() {
     elif command -v percol 1>/dev/null; then
       service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | percol)
     else
-      cat "$SIGN_CONFIG_DIR/service_names"
+      nServices=$(cat "$SIGN_CONFIG_DIR/service_names" | wc -l)
+
+      if [ "$nServices" -eq 1 ]; then
+        echo 'There is a service:'
+      else
+        echo "There are $nServices services:"
+      fi
+
+      echo
+      cat "$SIGN_CONFIG_DIR/service_names" | sed 's/^/  /'
+      echo
 
       printf %s 'Enter the service name: '
       read service_name

@@ -210,7 +210,7 @@ get() {
     exit 72
   fi
 
-  echo "$your_id" | xsel -bi
+  printf %s "$your_id" | xsel -bi
   echo_info 'Your ID is stored into the clipboard.'
 
   hash_and_then_copy "$service_name" "$your_id"

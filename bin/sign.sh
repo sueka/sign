@@ -247,9 +247,9 @@ hash_and_then_copy() {
 hexadecimal_to_duohexagesimal() {
   hex=$1 && shift
 
-  dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc | sed ':_;N;$!b_;s/\\\n//g')
+  dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc_with_no_linefeeds)
 
-  duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc | sed ':_;N;$!b_;s/\\\n//g' | tr ' ' '\n' | bc | sed ':_;N;$!b_;s/\\\n//g' | tr '\n' ' ')
+  duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds | tr '\n' ' ')
 
   for i in $duohexagesimal_digits
   do
@@ -263,6 +263,16 @@ hexadecimal_to_duohexagesimal() {
 
     printf "\\$(printf %o "$charcode")"
   done
+}
+
+#
+# bc_with_no_linefeeds
+#
+bc_with_no_linefeeds() {
+  while read line
+  do
+    echo "$line"
+  done | bc "$@" | sed ':_;N;$!b_;s/\\\n//g'
 }
 
 #

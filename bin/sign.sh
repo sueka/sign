@@ -237,24 +237,31 @@ hash_and_then_copy() {
   service_name=$1 && shift
   your_id=$1 && shift
 
-  hash=$(hex_to_printable_ascii "$(hmac_sha384 "$service_name $your_id" "$passphrase")")
+  hash=$(hexadecimal_to_duohexagesimal "$(hmac_sha384 "$service_name $your_id" "$passphrase")")
   printf %s "$hash" | xsel -bi
 }
 
 #
-# hex_to_printable_ascii <hex>
+# hexadecimal_to_duohexagesimal <hex>
 #
-hex_to_printable_ascii() {
-
-  # xxd が無い場合、 78 で終了する
-  if ! command -v xxd 1>/dev/null; then
-    echo_fatal "No command 'xxd' found." >&2
-    exit 78
-  fi
-
+hexadecimal_to_duohexagesimal() {
   hex=$1 && shift
 
-  printf %s "$hex" | xxd -r -p | strings -n1 | tr -d '\n'
+  dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc)
+  duo=$(echo 'obase=62;' "$dec" | bc | tr -d '\\\n')
+
+  for i in $duo
+  do
+    i=$(echo "$i" | bc)
+
+    if [ 0 -le "$i" -a "$i" -le 9 ]; then
+      printf %d "$i"
+    elif [ 10 -le "$i" -a "$i" -le 35 ]; then
+      printf "\\$(printf %o "$(( $i + 55 ))")"
+    elif [ 36 -le "$i" -a "$i" -le 61 ]; then
+      printf "\\$(printf %o "$(( $i + 61 ))")"
+    fi
+  done
 }
 
 #

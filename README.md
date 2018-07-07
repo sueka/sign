@@ -19,8 +19,7 @@ sudo ln -s /opt/local/sign/bin/sign.sh /usr/local/bin/sign
 
 - `openssl`
 - `xsel`
-- `xxd`
-- `peco` (arbitrary)
+- `peco` or `percol` (arbitrary)
 
 ## License
 

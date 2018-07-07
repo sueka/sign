@@ -254,12 +254,14 @@ hexadecimal_to_duohexagesimal() {
   for i in $duohexagesimal_digits
   do
     if [ 0 -le "$i" -a "$i" -le 9 ]; then
-      printf %d "$i"
+      charcode=$(echo "48 + $i - 0" | bc)
     elif [ 10 -le "$i" -a "$i" -le 35 ]; then
-      printf "\\$(printf %o "$(( $i + 55 ))")"
+      charcode=$(echo "65 + $i - 10" | bc)
     elif [ 36 -le "$i" -a "$i" -le 61 ]; then
-      printf "\\$(printf %o "$(( $i + 61 ))")"
+      charcode=$(echo "97 + $i - 36" | bc)
     fi
+
+    printf "\\$(printf %o "$charcode")"
   done
 }
 

@@ -247,9 +247,9 @@ hash_and_then_copy() {
 hexadecimal_to_duohexagesimal() {
   hex=$1 && shift
 
-  dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc)
+  dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc | sed ':_;N;$!b_;s/\\\n//g')
 
-  duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc | tr -d '\\\n' | tr ' ' '\n' | bc)
+  duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc | sed ':_;N;$!b_;s/\\\n//g' | tr ' ' '\n' | bc | sed ':_;N;$!b_;s/\\\n//g' | tr '\n' ' ')
 
   for i in $duohexagesimal_digits
   do

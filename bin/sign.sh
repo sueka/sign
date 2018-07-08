@@ -18,15 +18,15 @@ main() {
 
   case "$subcommand" in
     init )
-      init "$@"
+      sign_init "$@"
     ;;
 
     register )
-      register "$@"
+      sign_register "$@"
     ;;
 
     get )
-      get "$@"
+      sign_get "$@"
     ;;
 
     # サブコマンドが存在しない場合、 65 で終了する
@@ -38,9 +38,9 @@ main() {
 }
 
 #
-# init
+# sign_init
 #
-init() {
+sign_init() {
 
   # オプション付きで呼ばれた場合、 67 で終了する
   if [ -n "$*" ]; then
@@ -83,9 +83,9 @@ init() {
 }
 
 #
-# register [<service name> [<your ID>]]
+# sign_register [<service name> [<your ID>]]
 #
-register() {
+sign_register() {
 
   # サービス名一覧が存在しない場合、作成する
   if ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
@@ -135,9 +135,9 @@ register() {
 }
 
 #
-# get [<service name> [<your ID>]]
+# sign_get [<service name> [<your ID>]]
 #
-get() {
+sign_get() {
 
   # オプション無しで呼ばれた場合、サービス名の入力を受け付ける
   if [ -z "$*" ]; then

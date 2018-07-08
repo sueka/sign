@@ -170,6 +170,7 @@ sign_get() {
 
     # TODO: 似たサービス名を表示させる
 
+    echo_fatal "No service '$service_name' found." >&2
     exit 71
   fi
 

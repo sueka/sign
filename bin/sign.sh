@@ -152,13 +152,7 @@ sign_get() {
 
       echo "Service '$service_name' chosen."
     else
-      nServices=$(cat "$SIGN_CONFIG_DIR/service_names" | wc -l)
-
-      if [ "$nServices" -eq 1 ]; then
-        echo 'There is a service:'
-      else
-        echo "There are $nServices services:"
-      fi
+      echo 'Choose a service:'
 
       echo
       cat "$SIGN_CONFIG_DIR/service_names" | sed 's/^/  /'
@@ -192,7 +186,11 @@ sign_get() {
 
       echo "$service_name ID '$your_id' chosen."
     else
-      cat "$SIGN_CONFIG_DIR/${service_name}_ids"
+      echo "Choose your $service_name ID:"
+
+      echo
+      cat "$SIGN_CONFIG_DIR/${service_name}_ids" | sed 's/^/  /'
+      echo
 
       printf %s "Enter an ID of yours for $service_name: "
       read your_id

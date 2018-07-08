@@ -69,7 +69,7 @@ sign_init() {
 
   # passphrase と passphrase_again が異なる場合、 69 で終了する
   if [ "$passphrase" != "$passphrase_again" ]; then
-    echo_fatal 'Passphrases do not match each other.' >&2
+    echo_fatal 'Passphrases do not match.' >&2
     exit 69
   fi
 

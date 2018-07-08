@@ -1,11 +1,14 @@
 #!/bin/sh -eu
 
+NAME=$(basename "$0")
+
 SIGN_CONFIG_DIR="$HOME/.sign"
 
 #
 # main init
 # main register [<service name> [<your ID>]]
 # main get [<service name> [<your ID>]]
+# main migrate
 #
 main() {
 
@@ -27,6 +30,10 @@ main() {
 
     get )
       sign_get "$@"
+    ;;
+
+    migrate )
+      sign_migrate "$@"
     ;;
 
     # サブコマンドが存在しない場合、 65 で終了する
@@ -217,6 +224,79 @@ sign_get() {
 }
 
 #
+# sign_migrate
+#
+sign_migrate() {
+
+  # オプション付きで呼ばれた場合、 78 で終了する
+  if [ -n "$*" ]; then
+    exit 78
+  fi
+
+  # $SIGN_CONFIG_DIR が存在しない場合、 79 で終了する
+  if ! [ -d "$SIGN_CONFIG_DIR" ]; then
+    echo_fatal "$NAME is not initialized." >&2
+    exit 79
+  fi
+
+  # エコーバックを停止させる
+  stty -echo
+
+  printf %s 'Enter your old passphrase (invisible): '
+  read old_passphrase
+  echo
+
+  # エコーバックを再開させる
+  stty echo
+
+  # old_passphrase が誤っている場合、 80 で終了する
+  if [ $(hmac_sha256 "$old_passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+    echo_fatal 'Passphrase is wrong.' >&2
+    exit 80
+  fi
+
+  # エコーバックを停止させる
+  stty -echo
+
+  printf %s 'Enter your new passphrase (invisible): '
+  read new_passphrase
+  echo
+
+  printf %s 'Enter your new passphrase again (invisible): '
+  read new_passphrase_again
+  echo
+
+  # エコーバックを再開させる
+  stty echo
+
+  # new_passphrase と new_passphrase_again が異なる場合、 81 で終了する
+  if [ "$new_passphrase" != "$new_passphrase_again" ]; then
+    echo_fatal 'New passphrases do not match.' >&2
+    exit 81
+  fi
+
+  echo $(hmac_sha256 "$new_passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
+
+  for service_name in $(cat "$SIGN_CONFIG_DIR/service_names")
+  do
+    for your_id in $(cat "$SIGN_CONFIG_DIR/${service_name}_ids")
+    do
+      printf %s "$your_id" | xsel -bi
+      echo_info 'Your ID is stored into the clipboard.'
+      until_enter
+
+      hash_and_then_copy "$service_name" "$your_id" "$old_passphrase"
+      echo_info 'Your old password is stored into the clipboard.'
+      until_enter
+
+      hash_and_then_copy "$service_name" "$your_id" "$new_passphrase"
+      echo_info 'Your old password is stored into the clipboard.'
+      until_enter
+    done
+  done
+}
+
+#
 # hash_and_then_copy <service name> <your id> [<passphrase>]
 #
 hash_and_then_copy() {
@@ -328,6 +408,21 @@ print_colored() {
   printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
   printf %s "$@"
   printf '\e[0m'
+}
+
+#
+# until_enter
+#
+until_enter() {
+  while true
+  do
+    printf %s 'Press the enter key. '
+    read dummy
+
+    if [ -z "$dummy" ]; then
+      break
+    fi
+  done
 }
 
 main "$@"

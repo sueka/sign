@@ -217,7 +217,7 @@ sign_get() {
 }
 
 #
-# hash_and_then_copy <service name> <your id>
+# hash_and_then_copy <service name> <your id> [<passphrase>]
 #
 hash_and_then_copy() {
 
@@ -227,24 +227,24 @@ hash_and_then_copy() {
     exit 73
   fi
 
-  # エコーバックを停止させる
-  stty -echo
-
-  printf %s 'Enter your passphrase (invisible): '
-  read passphrase
-  echo
-
-  # エコーバックを再開させる
-  stty echo
-
-  # passphrase が誤っている場合、 70 で終了する
-  if [ $(hmac_sha256 "$passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
-    echo_fatal 'Passphrase is wrong.' >&2
-    exit 70
-  fi
-
   service_name=$1 && shift
   your_id=$1 && shift
+
+  # 第3オプション無しで呼ばれた場合、 passphrase を尋ねる
+  if [ -z "$*" ]; then
+
+    # エコーバックを停止させる
+    stty -echo
+
+    printf %s 'Enter your passphrase (invisible): '
+    read passphrase
+    echo
+
+    # エコーバックを再開させる
+    stty echo
+  else
+    passphrase=$1 && shift
+  fi
 
   hash=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
   printf %s "$hash" | xsel -bi

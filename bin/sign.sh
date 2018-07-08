@@ -246,8 +246,8 @@ hash_and_then_copy() {
     passphrase=$1 && shift
   fi
 
-  hash=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
-  printf %s "$hash" | xsel -bi
+  password=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
+  printf %s "$password" | xsel -bi
 }
 
 #

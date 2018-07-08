@@ -112,7 +112,7 @@ sign_register() {
     chmod 644 "$SIGN_CONFIG_DIR/${service_name}_ids"
   fi
 
-  # 1オプションで呼ばれた場合、 ID を尋ねる
+  # 第2オプション無しで呼ばれた場合、 ID を尋ねる
   if [ -z "$*" ]; then
     printf %s "Enter an ID of yours for $service_name: "
     read your_id
@@ -179,7 +179,7 @@ sign_get() {
     exit 71
   fi
 
-  # 1オプションで呼ばれた場合、 ID の入力を受け付ける
+  # 第2オプション無しで呼ばれた場合、 ID の入力を受け付ける
   if [ -z "$*" ]; then
 
     # peco または percol がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する

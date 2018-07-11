@@ -12,36 +12,36 @@ SIGN_CONFIG_DIR="$HOME/.sign"
 #
 main() {
 
-  # オプション無しで呼ばれた場合、 64 で終了する
-  if [ -z "$*" ]; then
-    exit 64
-  fi
+	# オプション無しで呼ばれた場合、 64 で終了する
+	if [ -z "$*" ]; then
+		exit 64
+	fi
 
-  subcommand=$1 && shift
+	subcommand=$1 && shift
 
-  case "$subcommand" in
-    init )
-      sign_init "$@"
-    ;;
+	case "$subcommand" in
+		init )
+			sign_init "$@"
+		;;
 
-    register )
-      sign_register "$@"
-    ;;
+		register )
+			sign_register "$@"
+		;;
 
-    get )
-      sign_get "$@"
-    ;;
+		get )
+			sign_get "$@"
+		;;
 
-    migrate )
-      sign_migrate "$@"
-    ;;
+		migrate )
+			sign_migrate "$@"
+		;;
 
-    # サブコマンドが存在しない場合、 65 で終了する
-    * )
-      echo_fatal "No subcommand '$subcommand' found." >&2
-      exit 65
-    ;;
-  esac
+		# サブコマンドが存在しない場合、 65 で終了する
+		* )
+			echo_fatal "No subcommand '$subcommand' found." >&2
+			exit 65
+		;;
+	esac
 }
 
 #
@@ -49,44 +49,44 @@ main() {
 #
 sign_init() {
 
-  # オプション付きで呼ばれた場合、 67 で終了する
-  if [ -n "$*" ]; then
-    exit 67
-  fi
+	# オプション付きで呼ばれた場合、 67 で終了する
+	if [ -n "$*" ]; then
+		exit 67
+	fi
 
-  # $SIGN_CONFIG_DIR が存在する場合、 68 で終了する
-  if [ -d "$SIGN_CONFIG_DIR" ]; then
-    echo_fatal "'$SIGN_CONFIG_DIR' does already exist." >&2
-    exit 68
-  fi
+	# $SIGN_CONFIG_DIR が存在する場合、 68 で終了する
+	if [ -d "$SIGN_CONFIG_DIR" ]; then
+		echo_fatal "'$SIGN_CONFIG_DIR' does already exist." >&2
+		exit 68
+	fi
 
-  # エコーバックを停止させる
-  stty -echo
+	# エコーバックを停止させる
+	stty -echo
 
-  printf %s 'Enter your passphrase (invisible): '
-  read passphrase
-  echo
+	printf %s 'Enter your passphrase (invisible): '
+	read passphrase
+	echo
 
-  printf %s 'Enter your passphrase again (invisible): '
-  read passphrase_again
-  echo
+	printf %s 'Enter your passphrase again (invisible): '
+	read passphrase_again
+	echo
 
-  # エコーバックを再開させる
-  stty echo
+	# エコーバックを再開させる
+	stty echo
 
-  # passphrase と passphrase_again が異なる場合、 69 で終了する
-  if [ "$passphrase" != "$passphrase_again" ]; then
-    echo_fatal 'Passphrases do not match.' >&2
-    exit 69
-  fi
+	# passphrase と passphrase_again が異なる場合、 69 で終了する
+	if [ "$passphrase" != "$passphrase_again" ]; then
+		echo_fatal 'Passphrases do not match.' >&2
+		exit 69
+	fi
 
-  mkdir -p "$SIGN_CONFIG_DIR"
-  chmod 700 "$SIGN_CONFIG_DIR"
+	mkdir -p "$SIGN_CONFIG_DIR"
+	chmod 700 "$SIGN_CONFIG_DIR"
 
-  touch "$SIGN_CONFIG_DIR/passphrase"
-  chmod 600 "$SIGN_CONFIG_DIR/passphrase"
+	touch "$SIGN_CONFIG_DIR/passphrase"
+	chmod 600 "$SIGN_CONFIG_DIR/passphrase"
 
-  echo $(hmac_sha256 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
+	echo $(hmac_sha256 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
 }
 
 #
@@ -94,51 +94,51 @@ sign_init() {
 #
 sign_register() {
 
-  # サービス名一覧が存在しない場合、作成する
-  if ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
-    touch "$SIGN_CONFIG_DIR/service_names"
-    chmod 755 "$SIGN_CONFIG_DIR/service_names"
-  fi
+	# サービス名一覧が存在しない場合、作成する
+	if ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
+		touch "$SIGN_CONFIG_DIR/service_names"
+		chmod 755 "$SIGN_CONFIG_DIR/service_names"
+	fi
 
-  # オプション無しで呼ばれた場合、サービス名を尋ねる
-  if [ -z "$*" ]; then
-    printf %s 'Enter the service name: '
-    read service_name
-  else
-    service_name=$1 && shift
-  fi
+	# オプション無しで呼ばれた場合、サービス名を尋ねる
+	if [ -z "$*" ]; then
+		printf %s 'Enter the service name: '
+		read service_name
+	else
+		service_name=$1 && shift
+	fi
 
-  # 指定されたサービス名がサービス名一覧に存在しない場合、作成する
-  if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
+	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する
+	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
 
-    # TODO: 似たサービス名を表示させる
+		# TODO: 似たサービス名を表示させる
 
-    echo "$service_name" >>"$SIGN_CONFIG_DIR/service_names"
+		echo "$service_name" >>"$SIGN_CONFIG_DIR/service_names"
 
-    touch "$SIGN_CONFIG_DIR/${service_name}_ids"
-    chmod 644 "$SIGN_CONFIG_DIR/${service_name}_ids"
-  fi
+		touch "$SIGN_CONFIG_DIR/${service_name}_ids"
+		chmod 644 "$SIGN_CONFIG_DIR/${service_name}_ids"
+	fi
 
-  # 第2オプション無しで呼ばれた場合、 ID を尋ねる
-  if [ -z "$*" ]; then
-    printf %s "Enter an ID of yours for $service_name: "
-    read your_id
-  else
-    your_id=$1 && shift
-  fi
+	# 第2オプション無しで呼ばれた場合、 ID を尋ねる
+	if [ -z "$*" ]; then
+		printf %s "Enter an ID of yours for $service_name: "
+		read your_id
+	else
+		your_id=$1 && shift
+	fi
 
-  # ID がすでに存在する場合、 77 で終了する
-  if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
-    echo_fatal "'$your_id' for $service_name does already exist." >&2
-    exit 77
-  fi
+	# ID がすでに存在する場合、 77 で終了する
+	if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
+		echo_fatal "'$your_id' for $service_name does already exist." >&2
+		exit 77
+	fi
 
-  # TODO: 似た ID を表示させる
+	# TODO: 似た ID を表示させる
 
-  echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
+	echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
 
-  hash_and_then_copy "$service_name" "$your_id"
-  echo_info 'Your password is stored into the clipboard.'
+	hash_and_then_copy "$service_name" "$your_id"
+	echo_info 'Your password is stored into the clipboard.'
 }
 
 #
@@ -146,81 +146,81 @@ sign_register() {
 #
 sign_get() {
 
-  # オプション無しで呼ばれた場合、サービス名の入力を受け付ける
-  if [ -z "$*" ]; then
+	# オプション無しで呼ばれた場合、サービス名の入力を受け付ける
+	if [ -z "$*" ]; then
 
-    # peco または percol がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
-    if command -v peco 1>/dev/null; then
-      service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | peco)
+		# peco または percol がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
+		if command -v peco 1>/dev/null; then
+			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | peco)
 
-      echo "Service '$service_name' chosen."
-    elif command -v percol 1>/dev/null; then
-      service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | percol)
+			echo "Service '$service_name' chosen."
+		elif command -v percol 1>/dev/null; then
+			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | percol)
 
-      echo "Service '$service_name' chosen."
-    else
-      echo 'Choose a service:'
+			echo "Service '$service_name' chosen."
+		else
+			echo 'Choose a service:'
 
-      echo
-      cat "$SIGN_CONFIG_DIR/service_names" | sed 's/^/  /'
-      echo
+			echo
+			cat "$SIGN_CONFIG_DIR/service_names" | sed 's/^/  /'
+			echo
 
-      printf %s 'Enter the service name: '
-      read service_name
-    fi
-  else
-    service_name=$1 && shift
-  fi
+			printf %s 'Enter the service name: '
+			read service_name
+		fi
+	else
+		service_name=$1 && shift
+	fi
 
-  # 指定されたサービス名がサービス一覧に存在しない場合、 71 で終了する
-  if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
+	# 指定されたサービス名がサービス一覧に存在しない場合、 71 で終了する
+	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
 
-    # TODO: 似たサービス名を表示させる
+		# TODO: 似たサービス名を表示させる
 
-    echo_fatal "No service '$service_name' found." >&2
-    exit 71
-  fi
+		echo_fatal "No service '$service_name' found." >&2
+		exit 71
+	fi
 
-  # 第2オプション無しで呼ばれた場合、 ID の入力を受け付ける
-  if [ -z "$*" ]; then
+	# 第2オプション無しで呼ばれた場合、 ID の入力を受け付ける
+	if [ -z "$*" ]; then
 
-    # peco または percol がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
-    if command -v peco 1>/dev/null; then
-      your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | peco)
+		# peco または percol がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
+		if command -v peco 1>/dev/null; then
+			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | peco)
 
-      echo "$service_name ID '$your_id' chosen."
-    elif command -v percol 1>/dev/null; then
-      your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | percol)
+			echo "$service_name ID '$your_id' chosen."
+		elif command -v percol 1>/dev/null; then
+			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | percol)
 
-      echo "$service_name ID '$your_id' chosen."
-    else
-      echo "Choose your $service_name ID:"
+			echo "$service_name ID '$your_id' chosen."
+		else
+			echo "Choose your $service_name ID:"
 
-      echo
-      cat "$SIGN_CONFIG_DIR/${service_name}_ids" | sed 's/^/  /'
-      echo
+			echo
+			cat "$SIGN_CONFIG_DIR/${service_name}_ids" | sed 's/^/  /'
+			echo
 
-      printf %s "Enter an ID of yours for $service_name: "
-      read your_id
-    fi
-  else
-    your_id=$1 && shift
-  fi
+			printf %s "Enter an ID of yours for $service_name: "
+			read your_id
+		fi
+	else
+		your_id=$1 && shift
+	fi
 
-  # ID が存在しない場合、 72 で終了する
-  if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
+	# ID が存在しない場合、 72 で終了する
+	if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
 
-    # TODO: 似た ID を表示させる
+		# TODO: 似た ID を表示させる
 
-    echo_fatal "No $service_name ID '$your_id' found." >&2
-    exit 72
-  fi
+		echo_fatal "No $service_name ID '$your_id' found." >&2
+		exit 72
+	fi
 
-  printf %s "$your_id" | xsel -bi
-  echo_info 'Your ID is stored into the clipboard.'
+	printf %s "$your_id" | xsel -bi
+	echo_info 'Your ID is stored into the clipboard.'
 
-  hash_and_then_copy "$service_name" "$your_id"
-  echo_info 'Your password is stored into the clipboard.'
+	hash_and_then_copy "$service_name" "$your_id"
+	echo_info 'Your password is stored into the clipboard.'
 }
 
 #
@@ -228,72 +228,72 @@ sign_get() {
 #
 sign_migrate() {
 
-  # オプション付きで呼ばれた場合、 78 で終了する
-  if [ -n "$*" ]; then
-    exit 78
-  fi
+	# オプション付きで呼ばれた場合、 78 で終了する
+	if [ -n "$*" ]; then
+		exit 78
+	fi
 
-  # $SIGN_CONFIG_DIR が存在しない場合、 79 で終了する
-  if ! [ -d "$SIGN_CONFIG_DIR" ]; then
-    echo_fatal "$NAME is not initialized." >&2
-    exit 79
-  fi
+	# $SIGN_CONFIG_DIR が存在しない場合、 79 で終了する
+	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
+		echo_fatal "$NAME is not initialized." >&2
+		exit 79
+	fi
 
-  # エコーバックを停止させる
-  stty -echo
+	# エコーバックを停止させる
+	stty -echo
 
-  printf %s 'Enter your old passphrase (invisible): '
-  read old_passphrase
-  echo
+	printf %s 'Enter your old passphrase (invisible): '
+	read old_passphrase
+	echo
 
-  # エコーバックを再開させる
-  stty echo
+	# エコーバックを再開させる
+	stty echo
 
-  # old_passphrase が誤っている場合、 80 で終了する
-  if [ $(hmac_sha256 "$old_passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
-    echo_fatal 'Passphrase is wrong.' >&2
-    exit 80
-  fi
+	# old_passphrase が誤っている場合、 80 で終了する
+	if [ $(hmac_sha256 "$old_passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+		echo_fatal 'Passphrase is wrong.' >&2
+		exit 80
+	fi
 
-  # エコーバックを停止させる
-  stty -echo
+	# エコーバックを停止させる
+	stty -echo
 
-  printf %s 'Enter your new passphrase (invisible): '
-  read new_passphrase
-  echo
+	printf %s 'Enter your new passphrase (invisible): '
+	read new_passphrase
+	echo
 
-  printf %s 'Enter your new passphrase again (invisible): '
-  read new_passphrase_again
-  echo
+	printf %s 'Enter your new passphrase again (invisible): '
+	read new_passphrase_again
+	echo
 
-  # エコーバックを再開させる
-  stty echo
+	# エコーバックを再開させる
+	stty echo
 
-  # new_passphrase と new_passphrase_again が異なる場合、 81 で終了する
-  if [ "$new_passphrase" != "$new_passphrase_again" ]; then
-    echo_fatal 'New passphrases do not match.' >&2
-    exit 81
-  fi
+	# new_passphrase と new_passphrase_again が異なる場合、 81 で終了する
+	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
+		echo_fatal 'New passphrases do not match.' >&2
+		exit 81
+	fi
 
-  echo $(hmac_sha256 "$new_passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
+	echo $(hmac_sha256 "$new_passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
 
-  for service_name in $(cat "$SIGN_CONFIG_DIR/service_names")
-  do
-    for your_id in $(cat "$SIGN_CONFIG_DIR/${service_name}_ids")
-    do
-      printf %s "$your_id" | xsel -bi
-      echo_info 'Your ID is stored into the clipboard.'
-      until_enter
+	for service_name in $(cat "$SIGN_CONFIG_DIR/service_names")
+	do
+		for your_id in $(cat "$SIGN_CONFIG_DIR/${service_name}_ids")
+		do
+			printf %s "$your_id" | xsel -bi
+			echo_info 'Your ID is stored into the clipboard.'
+			until_enter
 
-      hash_and_then_copy "$service_name" "$your_id" "$old_passphrase"
-      echo_info 'Your old password is stored into the clipboard.'
-      until_enter
+			hash_and_then_copy "$service_name" "$your_id" "$old_passphrase"
+			echo_info 'Your old password is stored into the clipboard.'
+			until_enter
 
-      hash_and_then_copy "$service_name" "$your_id" "$new_passphrase"
-      echo_info 'Your old password is stored into the clipboard.'
-      until_enter
-    done
-  done
+			hash_and_then_copy "$service_name" "$your_id" "$new_passphrase"
+			echo_info 'Your old password is stored into the clipboard.'
+			until_enter
+		done
+	done
 }
 
 #
@@ -301,67 +301,67 @@ sign_migrate() {
 #
 hash_and_then_copy() {
 
-  # xsel が無い場合、 73 で終了する
-  if ! command -v xsel 1>/dev/null; then
-    echo_fatal "No command 'xsel' found." >&2
-    exit 73
-  fi
+	# xsel が無い場合、 73 で終了する
+	if ! command -v xsel 1>/dev/null; then
+		echo_fatal "No command 'xsel' found." >&2
+		exit 73
+	fi
 
-  service_name=$1 && shift
-  your_id=$1 && shift
+	service_name=$1 && shift
+	your_id=$1 && shift
 
-  # 第3オプション無しで呼ばれた場合、 passphrase を尋ねる
-  if [ -z "$*" ]; then
+	# 第3オプション無しで呼ばれた場合、 passphrase を尋ねる
+	if [ -z "$*" ]; then
 
-    # エコーバックを停止させる
-    stty -echo
+		# エコーバックを停止させる
+		stty -echo
 
-    printf %s 'Enter your passphrase (invisible): '
-    read passphrase
-    echo
+		printf %s 'Enter your passphrase (invisible): '
+		read passphrase
+		echo
 
-    # エコーバックを再開させる
-    stty echo
-  else
-    passphrase=$1 && shift
-  fi
+		# エコーバックを再開させる
+		stty echo
+	else
+		passphrase=$1 && shift
+	fi
 
-  password=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
-  printf %s "$password" | xsel -bi
+	password=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
+	printf %s "$password" | xsel -bi
 }
 
 #
 # hexadecimal_to_duohexagesimal <hex>
 #
 hexadecimal_to_duohexagesimal() {
-  hex=$1 && shift
+	hex=$1 && shift
 
-  dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc_with_no_linefeeds)
+	dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc_with_no_linefeeds)
 
-  duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds | tr '\n' ' ')
+	duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds | tr '\n' ' ')
 
-  for i in $duohexagesimal_digits
-  do
-    if [ 0 -le "$i" -a "$i" -le 9 ]; then
-      charcode=$(echo "48 + $i - 0" | bc)
-    elif [ 10 -le "$i" -a "$i" -le 35 ]; then
-      charcode=$(echo "65 + $i - 10" | bc)
-    elif [ 36 -le "$i" -a "$i" -le 61 ]; then
-      charcode=$(echo "97 + $i - 36" | bc)
-    fi
+	for i in $duohexagesimal_digits
+	do
+		if [ 0 -le "$i" -a "$i" -le 9 ]; then
+			charcode=$(echo "48 + $i - 0" | bc)
+		elif [ 10 -le "$i" -a "$i" -le 35 ]; then
+			charcode=$(echo "65 + $i - 10" | bc)
+		elif [ 36 -le "$i" -a "$i" -le 61 ]; then
+			charcode=$(echo "97 + $i - 36" | bc)
+		fi
 
-    printf "\\$(printf %o "$charcode")"
-  done
+		printf "\\$(printf %o "$charcode")"
+	done
 }
 
 #
 # bc_with_no_linefeeds [-l] [<file> ..]
 #
 bc_with_no_linefeeds() {
-  while read line
-  do
-    echo "$line"
-  done | bc "$@" | sed ':_;N;$!b_;s/\\\n//g'
+	while read line
+	do
+		echo "$line"
+	done | bc "$@" | sed ':_;N;$!b_;s/\\\n//g'
 }
 
 #
@@ -369,60 +369,60 @@ bc_with_no_linefeeds() {
 #
 hmac_sha256() {
 
-  # openssl が無い場合、 66 で終了する
-  if ! command -v openssl 1>/dev/null; then
-    echo_fatal "No command 'openssl' found." >&2
-    exit 66
-  fi
+	# openssl が無い場合、 66 で終了する
+	if ! command -v openssl 1>/dev/null; then
+		echo_fatal "No command 'openssl' found." >&2
+		exit 66
+	fi
 
-  message=$1 && shift
-  secret_key=$1 && shift
+	message=$1 && shift
+	secret_key=$1 && shift
 
-  printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
+	printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
 }
 
 #
 # echo_info [<string> ..]
 #
 echo_info() {
-  print_colored 0 255 255 "[INFO]   $@"
-  echo
+	print_colored 0 255 255 "[INFO]   $@"
+	echo
 }
 
 #
 # echo_fatal [<string> ..]
 #
 echo_fatal() {
-  print_colored 255 0 0 "[FATAL]  $@"
-  echo
+	print_colored 255 0 0 "[FATAL]  $@"
+	echo
 }
 
 #
 # print_colored <red> <green> <blue> [<string> ..]
 #
 print_colored() {
-  red=$1 && shift
-  green=$1 && shift
-  blue=$1 && shift
+	red=$1 && shift
+	green=$1 && shift
+	blue=$1 && shift
 
-  printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
-  printf %s "$@"
-  printf '\e[0m'
+	printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
+	printf %s "$@"
+	printf '\e[0m'
 }
 
 #
 # until_enter
 #
 until_enter() {
-  while true
-  do
-    printf %s 'Press the enter key. '
-    read dummy
+	while true
+	do
+		printf %s 'Press the enter key. '
+		read dummy
 
-    if [ -z "$dummy" ]; then
-      break
-    fi
-  done
+		if [ -z "$dummy" ]; then
+			break
+		fi
+	done
 }
 
 main "$@"

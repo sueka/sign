@@ -1,5 +1,21 @@
 #!/bin/sh -eu
 
+EX_USAGE=64
+EX_DATAERR=65
+EX_NOINPUT=66
+EX_NOUSER=67
+EX_NOHOST=68
+EX_UNAVAILABLE=69
+EX_SOFTWARE=70
+EX_OSERR=71
+EX_OSFILE=72
+EX_CANTCREAT=73
+EX_IOERR=74
+EX_TEMPFAIL=75
+EX_PROTOCOL=76
+EX_NOPERM=77
+EX_CONFIG=78
+
 NAME=$(basename "$0")
 
 SIGN_CONFIG_DIR="$HOME/.sign"
@@ -12,9 +28,9 @@ SIGN_CONFIG_DIR="$HOME/.sign"
 #
 main() {
 
-	# オプション無しで呼ばれた場合、 64 で終了する
+	# オプション無しで呼ばれた場合
 	if [ -z "$*" ]; then
-		exit 64
+		exit $EX_USAGE
 	fi
 
 	subcommand=$1 && shift
@@ -36,10 +52,10 @@ main() {
 			sign_migrate "$@"
 		;;
 
-		# サブコマンドが存在しない場合、 65 で終了する
+		# サブコマンドが存在しない場合
 		* )
 			echo_fatal "No subcommand '$subcommand' found." >&2
-			exit 65
+			exit $EX_USAGE
 		;;
 	esac
 }
@@ -49,15 +65,15 @@ main() {
 #
 sign_init() {
 
-	# オプション付きで呼ばれた場合、 67 で終了する
+	# オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then
-		exit 67
+		exit $EX_USAGE
 	fi
 
-	# $SIGN_CONFIG_DIR が存在する場合、 68 で終了する
+	# $SIGN_CONFIG_DIR が存在する場合
 	if [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal "'$SIGN_CONFIG_DIR' does already exist." >&2
-		exit 68
+		exit $EX_SOFTWARE
 	fi
 
 	# エコーバックを停止させる
@@ -74,10 +90,10 @@ sign_init() {
 	# エコーバックを再開させる
 	stty echo
 
-	# passphrase と passphrase_again が異なる場合、 69 で終了する
+	# passphrase と passphrase_again が異なる場合
 	if [ "$passphrase" != "$passphrase_again" ]; then
 		echo_fatal 'Passphrases do not match.' >&2
-		exit 69
+		exit $EX_SOFTWARE
 	fi
 
 	mkdir -p "$SIGN_CONFIG_DIR"
@@ -127,10 +143,10 @@ sign_register() {
 		your_id=$1 && shift
 	fi
 
-	# ID がすでに存在する場合、 77 で終了する
+	# ID がすでに存在する場合
 	if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
 		echo_fatal "'$your_id' for $service_name does already exist." >&2
-		exit 77
+		exit $EX_SOFTWARE
 	fi
 
 	# TODO: 似た ID を表示させる
@@ -172,13 +188,13 @@ sign_get() {
 		service_name=$1 && shift
 	fi
 
-	# 指定されたサービス名がサービス一覧に存在しない場合、 71 で終了する
+	# 指定されたサービス名がサービス一覧に存在しない場合
 	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
 
 		# TODO: 似たサービス名を表示させる
 
 		echo_fatal "No service '$service_name' found." >&2
-		exit 71
+		exit $EX_SOFTWARE
 	fi
 
 	# 第2オプション無しで呼ばれた場合、 ID の入力を受け付ける
@@ -207,13 +223,13 @@ sign_get() {
 		your_id=$1 && shift
 	fi
 
-	# ID が存在しない場合、 72 で終了する
+	# ID が存在しない場合
 	if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
 
 		# TODO: 似た ID を表示させる
 
 		echo_fatal "No $service_name ID '$your_id' found." >&2
-		exit 72
+		exit $EX_SOFTWARE
 	fi
 
 	printf %s "$your_id" | xsel -bi
@@ -228,15 +244,15 @@ sign_get() {
 #
 sign_migrate() {
 
-	# オプション付きで呼ばれた場合、 78 で終了する
+	# オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then
-		exit 78
+		exit $EX_USAGE
 	fi
 
-	# $SIGN_CONFIG_DIR が存在しない場合、 79 で終了する
+	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal "$NAME is not initialized." >&2
-		exit 79
+		exit $EX_IOERR
 	fi
 
 	# エコーバックを停止させる
@@ -249,10 +265,10 @@ sign_migrate() {
 	# エコーバックを再開させる
 	stty echo
 
-	# old_passphrase が誤っている場合、 80 で終了する
+	# old_passphrase が誤っている場合
 	if [ $(hmac_sha256 "$old_passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
-		exit 80
+		exit $EX_SOFTWARE
 	fi
 
 	# エコーバックを停止させる
@@ -269,10 +285,10 @@ sign_migrate() {
 	# エコーバックを再開させる
 	stty echo
 
-	# new_passphrase と new_passphrase_again が異なる場合、 81 で終了する
+	# new_passphrase と new_passphrase_again が異なる場合
 	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
 		echo_fatal 'New passphrases do not match.' >&2
-		exit 81
+		exit $EX_SOFTWARE
 	fi
 
 	echo $(hmac_sha256 "$new_passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
@@ -301,10 +317,10 @@ sign_migrate() {
 #
 hash_and_then_copy() {
 
-	# xsel が無い場合、 73 で終了する
+	# xsel が無い場合
 	if ! command -v xsel 1>/dev/null; then
 		echo_fatal "No command 'xsel' found." >&2
-		exit 73
+		exit $EX_UNAVAILABLE
 	fi
 
 	service_name=$1 && shift
@@ -369,10 +385,10 @@ bc_with_no_linefeeds() {
 #
 hmac_sha256() {
 
-	# openssl が無い場合、 66 で終了する
+	# openssl が無い場合
 	if ! command -v openssl 1>/dev/null; then
 		echo_fatal "No command 'openssl' found." >&2
-		exit 66
+		exit $EX_UNAVAILABLE
 	fi
 
 	message=$1 && shift

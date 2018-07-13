@@ -352,7 +352,9 @@ hash_and_then_copy() {
 hexadecimal_to_duohexagesimal() {
 	hex=$1 && shift
 
-	dec=$(echo 'ibase=16;' "$(printf %s "$hex" | tr 'a-z' 'A-Z')" | bc_with_no_linefeeds)
+	uppercase_hex=$(printf %s "$hex" | tr 'a-z' 'A-Z')
+
+	dec=$(echo 'ibase=16;' "$uppercase_hex" | bc_with_no_linefeeds)
 
 	duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds | tr '\n' ' ')
 

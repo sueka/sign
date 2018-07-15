@@ -80,11 +80,11 @@ sign_init() {
 	stty -echo
 
 	printf %s 'Enter your passphrase (invisible): '
-	read passphrase
+	IFS= read -r passphrase
 	echo
 
 	printf %s 'Enter your passphrase again (invisible): '
-	read passphrase_again
+	IFS= read -r passphrase_again
 	echo
 
 	# エコーバックを再開させる
@@ -119,7 +119,7 @@ sign_register() {
 	# オプション無しで呼ばれた場合、サービス名を尋ねる
 	if [ -z "$*" ]; then
 		printf %s 'Enter the service name: '
-		read service_name
+		IFS= read -r service_name
 	else
 		service_name=$1 && shift
 	fi
@@ -138,7 +138,7 @@ sign_register() {
 	# 第2オプション無しで呼ばれた場合、 ID を尋ねる
 	if [ -z "$*" ]; then
 		printf %s "Enter an ID of yours for $service_name: "
-		read your_id
+		IFS= read -r your_id
 	else
 		your_id=$1 && shift
 	fi
@@ -182,7 +182,7 @@ sign_get() {
 			echo
 
 			printf %s 'Enter the service name: '
-			read service_name
+			IFS= read -r service_name
 		fi
 	else
 		service_name=$1 && shift
@@ -217,7 +217,7 @@ sign_get() {
 			echo
 
 			printf %s "Enter an ID of yours for $service_name: "
-			read your_id
+			IFS= read -r your_id
 		fi
 	else
 		your_id=$1 && shift
@@ -259,7 +259,7 @@ sign_migrate() {
 	stty -echo
 
 	printf %s 'Enter your old passphrase (invisible): '
-	read old_passphrase
+	IFS= read -r old_passphrase
 	echo
 
 	# エコーバックを再開させる
@@ -275,11 +275,11 @@ sign_migrate() {
 	stty -echo
 
 	printf %s 'Enter your new passphrase (invisible): '
-	read new_passphrase
+	IFS= read -r new_passphrase
 	echo
 
 	printf %s 'Enter your new passphrase again (invisible): '
-	read new_passphrase_again
+	IFS= read -r new_passphrase_again
 	echo
 
 	# エコーバックを再開させる
@@ -333,7 +333,7 @@ hash_and_then_copy() {
 		stty -echo
 
 		printf %s 'Enter your passphrase (invisible): '
-		read passphrase
+		IFS= read -r passphrase
 		echo
 
 		# エコーバックを再開させる
@@ -435,7 +435,7 @@ until_enter() {
 	while true
 	do
 		printf %s 'Press the enter key. '
-		read dummy
+		IFS= read dummy
 
 		if [ -z "$dummy" ]; then
 			break

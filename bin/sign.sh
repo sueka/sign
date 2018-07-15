@@ -363,11 +363,11 @@ hexadecimal_to_duohexagesimal() {
 	for i in $duohexagesimal_digits
 	do
 		if [ 0 -le "$i" ] && [ "$i" -le 9 ]; then
-			charcode=$(echo "48 + $i - 0" | bc)
+			charcode=$(echo "$i - 0 + 48" | bc)
 		elif [ 10 -le "$i" ] && [ "$i" -le 35 ]; then
-			charcode=$(echo "65 + $i - 10" | bc)
+			charcode=$(echo "$i - 10 + 65" | bc)
 		elif [ 36 -le "$i" ] && [ "$i" -le 61 ]; then
-			charcode=$(echo "97 + $i - 36" | bc)
+			charcode=$(echo "$i - 36 + 97" | bc)
 		fi
 
 		printf "\\$(printf %o "$charcode")"

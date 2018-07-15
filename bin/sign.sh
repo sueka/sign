@@ -306,7 +306,7 @@ sign_migrate() {
 			until_enter
 
 			hash_and_then_copy "$service_name" "$your_id" "$new_passphrase"
-			echo_info 'Your old password is stored into the clipboard.'
+			echo_info 'Your new password is stored into the clipboard.'
 			until_enter
 		done
 	done

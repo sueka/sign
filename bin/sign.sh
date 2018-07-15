@@ -19,6 +19,7 @@ EX_CONFIG=78
 NAME=$(basename "$0")
 
 SIGN_CONFIG_DIR="$HOME/.sign"
+SECRET_KEY='a secret key'
 
 #
 # main init
@@ -102,7 +103,7 @@ sign_init() {
 	touch "$SIGN_CONFIG_DIR/passphrase"
 	chmod 600 "$SIGN_CONFIG_DIR/passphrase"
 
-	echo $(hmac_sha256 "$passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
+	echo $(hmac_sha256 "$passphrase" "$SECRET_KEY") >"$SIGN_CONFIG_DIR/passphrase"
 }
 
 #
@@ -266,7 +267,7 @@ sign_migrate() {
 	stty echo
 
 	# old_passphrase が誤っている場合
-	if [ $(hmac_sha256 "$old_passphrase" 'a secret key') != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+	if [ $(hmac_sha256 "$old_passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		exit $EX_SOFTWARE
 	fi

@@ -145,7 +145,7 @@ sign_register() {
 
 	# ID がすでに存在する場合
 	if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
-		echo_fatal "'$your_id' for $service_name does already exist." >&2
+		echo_fatal "$service_name ID '$your_id' does already exist." >&2
 		exit $EX_SOFTWARE
 	fi
 

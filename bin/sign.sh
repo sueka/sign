@@ -297,16 +297,18 @@ sign_migrate() {
 	do
 		for your_id in $(cat "$SIGN_CONFIG_DIR/${service_name}_ids")
 		do
+			echo_info "Changing your password for $service_name ID '$your_id'.."
+
 			printf %s "$your_id" | xsel -bi
-			echo_info 'Your ID is stored in the clipboard.'
+			echo_info "Your ID '$your_id' is stored in the clipboard."
 			until_enter
 
 			hash_and_then_copy "$service_name" "$your_id" "$old_passphrase"
-			echo_info 'Your old password is stored in the clipboard.'
+			echo_info "Your old password for $service_name ID '$your_id' is stored in the clipboard."
 			until_enter
 
 			hash_and_then_copy "$service_name" "$your_id" "$new_passphrase"
-			echo_info 'Your new password is stored in the clipboard.'
+			echo_info "Your new password for $service_name ID '$your_id' is stored in the clipboard."
 			until_enter
 		done
 	done

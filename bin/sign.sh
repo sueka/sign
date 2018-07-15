@@ -154,7 +154,7 @@ sign_register() {
 	echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
 
 	hash_and_then_copy "$service_name" "$your_id"
-	echo_info 'Your password is stored into the clipboard.'
+	echo_info 'Your password is stored in the clipboard.'
 }
 
 #
@@ -233,10 +233,10 @@ sign_get() {
 	fi
 
 	printf %s "$your_id" | xsel -bi
-	echo_info 'Your ID is stored into the clipboard.'
+	echo_info 'Your ID is stored in the clipboard.'
 
 	hash_and_then_copy "$service_name" "$your_id"
-	echo_info 'Your password is stored into the clipboard.'
+	echo_info 'Your password is stored in the clipboard.'
 }
 
 #
@@ -298,15 +298,15 @@ sign_migrate() {
 		for your_id in $(cat "$SIGN_CONFIG_DIR/${service_name}_ids")
 		do
 			printf %s "$your_id" | xsel -bi
-			echo_info 'Your ID is stored into the clipboard.'
+			echo_info 'Your ID is stored in the clipboard.'
 			until_enter
 
 			hash_and_then_copy "$service_name" "$your_id" "$old_passphrase"
-			echo_info 'Your old password is stored into the clipboard.'
+			echo_info 'Your old password is stored in the clipboard.'
 			until_enter
 
 			hash_and_then_copy "$service_name" "$your_id" "$new_passphrase"
-			echo_info 'Your new password is stored into the clipboard.'
+			echo_info 'Your new password is stored in the clipboard.'
 			until_enter
 		done
 	done

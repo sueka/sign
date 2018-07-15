@@ -354,11 +354,11 @@ hash_and_then_copy() {
 hexadecimal_to_duohexagesimal() {
 	hex=$1 && shift
 
-	uppercase_hex=$(printf %s "$hex" | LC_COLLATE=C tr 'a-z' 'A-Z')
+	uppercase_hex=$(printf %s "$hex" | LC_COLLATE=C tr a-z A-Z)
 
-	dec=$(echo 'ibase=16;' "$uppercase_hex" | bc_with_no_linefeeds)
+	dec=$(echo "ibase=16; $uppercase_hex" | bc_with_no_linefeeds)
 
-	duohexagesimal_digits=$(echo 'obase=62;' "$dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds | tr '\n' ' ')
+	duohexagesimal_digits=$(echo "obase=62; $dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds | tr '\n' ' ')
 
 	for i in $duohexagesimal_digits
 	do

@@ -153,7 +153,7 @@ sign_register() {
 
 	echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
 
-	hash_and_then_copy "$service_name" "$your_id"
+	copy_password "$service_name" "$your_id"
 	echo_info 'Your password is stored in the clipboard.'
 }
 
@@ -235,7 +235,7 @@ sign_get() {
 	printf %s "$your_id" | xsel -bi
 	echo_info 'Your ID is stored in the clipboard.'
 
-	hash_and_then_copy "$service_name" "$your_id"
+	copy_password "$service_name" "$your_id"
 	echo_info 'Your password is stored in the clipboard.'
 }
 
@@ -303,11 +303,11 @@ sign_migrate() {
 			echo_info "Your ID '$your_id' is stored in the clipboard."
 			until_enter
 
-			hash_and_then_copy "$service_name" "$your_id" "$old_passphrase"
+			copy_password "$service_name" "$your_id" "$old_passphrase"
 			echo_info "Your old password for $service_name ID '$your_id' is stored in the clipboard."
 			until_enter
 
-			hash_and_then_copy "$service_name" "$your_id" "$new_passphrase"
+			copy_password "$service_name" "$your_id" "$new_passphrase"
 			echo_info "Your new password for $service_name ID '$your_id' is stored in the clipboard."
 			until_enter
 		done
@@ -315,9 +315,9 @@ sign_migrate() {
 }
 
 #
-# hash_and_then_copy <service name> <your id> [<passphrase>]
+# copy_password <service name> <your id> [<passphrase>]
 #
-hash_and_then_copy() {
+copy_password() {
 
 	# xsel が無い場合
 	if ! command -v xsel 1>/dev/null; then

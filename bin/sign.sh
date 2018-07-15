@@ -119,7 +119,7 @@ sign_register() {
 	# オプション無しで呼ばれた場合、サービス名を尋ねる
 	if [ -z "$*" ]; then
 		printf %s 'Enter the service name: '
-		IFS= read -r service_name
+		read -r service_name
 	else
 		service_name=$1 && shift
 	fi
@@ -138,7 +138,7 @@ sign_register() {
 	# 第2オプション無しで呼ばれた場合、 ID を尋ねる
 	if [ -z "$*" ]; then
 		printf %s "Enter an ID of yours for $service_name: "
-		IFS= read -r your_id
+		read -r your_id
 	else
 		your_id=$1 && shift
 	fi
@@ -182,7 +182,7 @@ sign_get() {
 			echo
 
 			printf %s 'Enter the service name: '
-			IFS= read -r service_name
+			read -r service_name
 		fi
 	else
 		service_name=$1 && shift
@@ -217,7 +217,7 @@ sign_get() {
 			echo
 
 			printf %s "Enter an ID of yours for $service_name: "
-			IFS= read -r your_id
+			read -r your_id
 		fi
 	else
 		your_id=$1 && shift

@@ -21,6 +21,16 @@ sudo ln -s /opt/local/sign/bin/sign.sh /usr/local/bin/sign
 - `xsel`
 - `peco` or `percol` (optional)
 
+---
+
+Executing `sign init` asks your passphrase and stores it (hashed) in "$HOME/.sign/passphrase".
+
+When you sign up, use `sign register`.
+
+When you sign in, use `sign get`.
+
+To change your passphrase, use `sign migrate`.
+
 ## License
 
 [CC0 1.0 Universal](./LICENSE.txt)

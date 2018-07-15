@@ -352,7 +352,7 @@ hash_and_then_copy() {
 hexadecimal_to_duohexagesimal() {
 	hex=$1 && shift
 
-	uppercase_hex=$(printf %s "$hex" | tr 'a-z' 'A-Z')
+	uppercase_hex=$(printf %s "$hex" | LC_COLLATE=C tr 'a-z' 'A-Z')
 
 	dec=$(echo 'ibase=16;' "$uppercase_hex" | bc_with_no_linefeeds)
 

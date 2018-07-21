@@ -464,4 +464,20 @@ until_enter() {
 	done
 }
 
-main "$@"
+# entry
+case "$NAME" in
+	sign )
+		main "$@"
+	;;
+
+	sign.sh )
+		main "$@"
+	;;
+
+	sign_test.sh )
+	;;
+
+	* )
+		exit $EX_USAGE
+	;;
+esac

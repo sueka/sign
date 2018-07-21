@@ -31,7 +31,7 @@ main() {
 
 	# オプション無しで呼ばれた場合
 	if [ -z "$*" ]; then
-		exit $EX_USAGE
+		return $EX_USAGE
 	fi
 
 	subcommand=$1 && shift
@@ -56,7 +56,7 @@ main() {
 		# サブコマンドが存在しない場合
 		* )
 			echo_fatal "No subcommand '$subcommand' found." >&2
-			exit $EX_USAGE
+			return $EX_USAGE
 		;;
 	esac
 }
@@ -68,13 +68,13 @@ sign_init() {
 
 	# オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then
-		exit $EX_USAGE
+		return $EX_USAGE
 	fi
 
 	# $SIGN_CONFIG_DIR が存在する場合
 	if [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal "'$SIGN_CONFIG_DIR' does already exist." >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	# エコーバックを停止させる
@@ -90,7 +90,7 @@ sign_init() {
 	# passphrase が空文字列の場合
 	if [ -z "$passphrase" ]; then
 		echo_fatal 'Passphrase should not be blank.' >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	# エコーバックを停止させる
@@ -106,7 +106,7 @@ sign_init() {
 	# passphrase と passphrase_again が異なる場合
 	if [ "$passphrase" != "$passphrase_again" ]; then
 		echo_fatal 'Passphrases do not match.' >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	mkdir -p "$SIGN_CONFIG_DIR"
@@ -159,7 +159,7 @@ sign_register() {
 	# ID がすでに存在する場合
 	if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
 		echo_fatal "$service_name ID '$your_id' does already exist." >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	# TODO: 似た ID を表示させる
@@ -207,7 +207,7 @@ sign_get() {
 		# TODO: 似たサービス名を表示させる
 
 		echo_fatal "No service '$service_name' found." >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	# 第2オプション無しで呼ばれた場合、 ID の入力を受け付ける
@@ -242,7 +242,7 @@ sign_get() {
 		# TODO: 似た ID を表示させる
 
 		echo_fatal "No $service_name ID '$your_id' found." >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	printf %s "$your_id" | xsel -bi
@@ -259,13 +259,13 @@ sign_migrate() {
 
 	# オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then
-		exit $EX_USAGE
+		return $EX_USAGE
 	fi
 
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Execute `sign init`.' >&2
-		exit $EX_IOERR
+		return $EX_IOERR
 	fi
 
 	# エコーバックを停止させる
@@ -281,7 +281,7 @@ sign_migrate() {
 	# old_passphrase が誤っている場合
 	if [ $(hmac_sha256 "$old_passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	# エコーバックを停止させる
@@ -301,7 +301,7 @@ sign_migrate() {
 	# new_passphrase と new_passphrase_again が異なる場合
 	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
 		echo_fatal 'New passphrases do not match.' >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	echo $(hmac_sha256 "$new_passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
@@ -335,7 +335,7 @@ copy_password() {
 	# xsel が無い場合
 	if ! command -v xsel 1>/dev/null; then
 		echo_fatal "No command 'xsel' found." >&2
-		exit $EX_UNAVAILABLE
+		return $EX_UNAVAILABLE
 	fi
 
 	service_name=$1 && shift
@@ -360,7 +360,7 @@ copy_password() {
 	# passphrase が誤っている場合
 	if [ $(hmac_sha256 "$passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
-		exit $EX_SOFTWARE
+		return $EX_SOFTWARE
 	fi
 
 	password=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
@@ -411,7 +411,7 @@ hmac_sha256() {
 	# openssl が無い場合
 	if ! command -v openssl 1>/dev/null; then
 		echo_fatal "No command 'openssl' found." >&2
-		exit $EX_UNAVAILABLE
+		return $EX_UNAVAILABLE
 	fi
 
 	message=$1 && shift
@@ -478,6 +478,6 @@ case "$NAME" in
 	;;
 
 	* )
-		exit $EX_USAGE
+		return $EX_USAGE
 	;;
 esac

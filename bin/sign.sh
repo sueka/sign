@@ -345,6 +345,12 @@ copy_password() {
 		passphrase=$1 && shift
 	fi
 
+	# passphrase が誤っている場合
+	if [ $(hmac_sha256 "$passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+		echo_fatal 'Passphrase is wrong.' >&2
+		exit $EX_SOFTWARE
+	fi
+
 	password=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
 	printf %s "$password" | xsel -bi
 }

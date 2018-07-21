@@ -264,7 +264,7 @@ sign_migrate() {
 
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
-		echo_fatal "$NAME is not initialized." >&2
+		echo_fatal 'Execute `sign init`.' >&2
 		exit $EX_IOERR
 	fi
 

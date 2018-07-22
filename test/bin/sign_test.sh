@@ -18,7 +18,16 @@ EX_PROTOCOL=76
 EX_NOPERM=77
 EX_CONFIG=78
 
+#
+# setup
+#
 setup() {
+
+	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
 
 	. "$PROJECT_ROOT_DIR/bin/sign.sh"
@@ -34,11 +43,29 @@ setup() {
 	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/tmp/bin:$PATH"
 }
 
+#
+# teardown
+#
 teardown() {
+
+	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	rm -r "$PROJECT_ROOT_DIR/test/tmp"
 }
 
+#
+# test
+#
 test() {
+
+	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	setup
 
 	main_test
@@ -47,11 +74,29 @@ test() {
 	teardown
 }
 
+#
+# main_test
+#
 main_test() {
+
+	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	assert 'main' $EX_USAGE
 }
 
+#
+# sign_init_test
+#
 sign_init_test() {
+
+	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	SIGN_CONFIG_DIR="$PROJECT_ROOT_DIR/test/tmp/home/.sign"
 
 	valid_passphrases=$(cat <<-'EOD'

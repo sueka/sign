@@ -40,7 +40,7 @@ setup() {
 
 	chmod +x "$PROJECT_ROOT_DIR/test/tmp/bin/stty"
 
-	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/tmp/bin:$PATH"
+	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/tmp/bin"':$PATH'
 }
 
 #

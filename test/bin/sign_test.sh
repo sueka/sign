@@ -18,6 +18,8 @@ EX_PROTOCOL=76
 EX_NOPERM=77
 EX_CONFIG=78
 
+LF='\n'
+
 #
 # setup
 #
@@ -116,8 +118,19 @@ sign_init_test() {
 		rm -r "$PROJECT_ROOT_DIR/test/tmp/home/.sign"
 	done
 
+	# passphrase と passphrase_again は完全に一致しなければならない。
+	valid_passphrase='passphrase'
+	assert "echo 'passphrase${LF}passphrase ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
+
+	# sign_init はオプションを受け付けない。
 	assert "sign_init :" $EX_USAGE
+
+	# passphrase は空文字列であってはならない。
 	assert "echo '' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
+
+	# passphrase は空白のみでもよい。
+	assert "echo ' \n ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
+	rm -r "$PROJECT_ROOT_DIR/test/tmp/home/.sign"
 }
 
 #

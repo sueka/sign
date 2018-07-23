@@ -146,17 +146,33 @@ assert() {
 	actual_exit_status=$?
 
 	if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
-		echo_info "'$command' exited with $actual_exit_status as expected."
+		report_pass "'$command' exited with $actual_exit_status as expected."
 	else
-		echo_fatal "'$command' is expected to exit with $expected_exit_status, but it exited with $actual_exit_status."
+		report_failure "'$command' is expected to exit with $expected_exit_status, but it exited with $actual_exit_status."
 	fi
+}
+
+#
+# report_pass [<string> ..]
+#
+report_pass() {
+	print_colored 0 128 0 "[PASS]    $@"
+	echo
+}
+
+#
+# report_failure [<string> ..]
+#
+report_failure() {
+	print_colored 255 0 0 "[FAILURE] $@"
+	echo
 }
 
 #
 # echo_info [<string> ..]
 #
 echo_info() {
-	print_colored 0 255 255 "[INFO]   $@"
+	print_colored 0 255 255 "[INFO]    $@"
 	echo
 }
 
@@ -164,7 +180,7 @@ echo_info() {
 # echo_fatal [<string> ..]
 #
 echo_fatal() {
-	print_colored 255 0 0 "[FATAL]  $@"
+	print_colored 255 0 0 "[FATAL]   $@"
 	echo
 }
 

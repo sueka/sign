@@ -119,7 +119,6 @@ sign_init_test() {
 	done
 
 	# passphrase と passphrase_again は完全に一致しなければならない。
-	valid_passphrase='passphrase'
 	assert "echo 'passphrase${LF}passphrase ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
 
 	# sign_init はオプションを受け付けない。

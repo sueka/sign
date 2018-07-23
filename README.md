@@ -13,6 +13,15 @@ git clone --depth=1 https://github.com/sueka/sign.git /opt/local/sign
 sudo ln -s /opt/local/sign/bin/sign.sh /usr/local/bin/sign
 ```
 
+### Update
+
+``` sh
+cd /opt/local/sign
+
+git checkout master
+git pull origin master
+```
+
 ## Usage
 
 ### Dependencies

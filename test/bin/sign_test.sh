@@ -20,6 +20,8 @@ EX_CONFIG=78
 
 LF='\n'
 
+NAME=$(basename "$0")
+
 #
 # setup
 #
@@ -195,4 +197,16 @@ print_colored() {
 	printf '\e[0m'
 }
 
-test "$@"
+# entry
+case "$NAME" in
+	sign_test.sh )
+		test "$@"
+	;;
+
+	sign_test_test.sh )
+	;;
+
+	* )
+		return $EX_USAGE
+	;;
+esac

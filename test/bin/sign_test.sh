@@ -41,13 +41,7 @@ setup() {
 
 	mkdir -p "$PROJECT_ROOT_DIR/test/tmp"
 
-	mkdir -p "$PROJECT_ROOT_DIR/test/tmp/bin"
-
-	echo '#!/bin/sh' >"$PROJECT_ROOT_DIR/test/tmp/bin/stty"
-
-	chmod +x "$PROJECT_ROOT_DIR/test/tmp/bin/stty"
-
-	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/tmp/bin"':$PATH'
+	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/dummy-stty/bin"':$PATH'
 }
 
 #

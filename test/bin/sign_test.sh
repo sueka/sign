@@ -20,7 +20,8 @@ EX_PROTOCOL=76
 EX_NOPERM=77
 EX_CONFIG=78
 
-LF='\n'
+LF='
+'
 
 NAME=$(basename "$0")
 
@@ -116,7 +117,7 @@ sign_init_test() {
 
 	echo "$valid_passphrases" | while IFS= read -r line
 	do
-		input="$line\n$line"
+		input="$line$LF$line"
 
 		assert "echo '$input' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
 		rm -r "$PROJECT_ROOT_DIR/test/tmp/home/.sign"
@@ -132,7 +133,7 @@ sign_init_test() {
 	assert "echo '' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
 
 	# passphrase は空白のみでもよい。
-	assert "echo ' \n ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
+	assert "echo ' $LF ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
 	rm -r "$PROJECT_ROOT_DIR/test/tmp/home/.sign"
 }
 

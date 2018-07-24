@@ -431,29 +431,14 @@ hmac_sha256() {
 # echo_info [<string> ..]
 #
 echo_info() {
-	print_colored 0 255 255 "[INFO]   $@"
-	echo
+	echo "[INFO]   $@"
 }
 
 #
 # echo_fatal [<string> ..]
 #
 echo_fatal() {
-	print_colored 255 0 0 "[FATAL]  $@"
-	echo
-}
-
-#
-# print_colored <red> <green> <blue> [<string> ..]
-#
-print_colored() {
-	red=$1 && shift
-	green=$1 && shift
-	blue=$1 && shift
-
-	printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
-	printf %s "$@"
-	printf '\e[0m'
+	echo "[FATAL]  $@"
 }
 
 #

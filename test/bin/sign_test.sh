@@ -159,45 +159,28 @@ assert() {
 # report_pass [<string> ..]
 #
 report_pass() {
-	print_colored 0 128 0 "[PASS]    $@"
-	echo
+	echo "[PASS]    $@"
 }
 
 #
 # report_failure [<string> ..]
 #
 report_failure() {
-	print_colored 255 0 0 "[FAILURE] $@"
-	echo
+	echo "[FAILURE] $@"
 }
 
 #
 # echo_info [<string> ..]
 #
 echo_info() {
-	print_colored 0 255 255 "[INFO]    $@"
-	echo
+	echo "[INFO]    $@"
 }
 
 #
 # echo_fatal [<string> ..]
 #
 echo_fatal() {
-	print_colored 255 0 0 "[FATAL]   $@"
-	echo
-}
-
-#
-# print_colored <red> <green> <blue> [<string> ..]
-#
-print_colored() {
-	red=$1 && shift
-	green=$1 && shift
-	blue=$1 && shift
-
-	printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
-	printf %s "$@"
-	printf '\e[0m'
+	echo "[FATAL]   $@"
 }
 
 # entry

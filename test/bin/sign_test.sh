@@ -146,7 +146,7 @@ assert() {
 
 	# TODO: $command が実行可能であることを確認する
 
-	actual_exit_status=$(set +e; eval $command >/dev/null 2>&1; echo $?)
+	actual_exit_status=$(set +e; eval "$command" >/dev/null 2>&1; echo $?)
 
 	if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
 		report_pass "'$command' exited with $actual_exit_status as expected."

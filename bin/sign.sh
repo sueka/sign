@@ -95,6 +95,7 @@ sign_init() {
 	fi
 
 	# エコーバックを停止させる
+	old_config=$(stty -g)
 	stty -echo
 
 	printf %s 'Enter your passphrase (invisible): '
@@ -102,7 +103,7 @@ sign_init() {
 	echo
 
 	# エコーバックを再開させる
-	stty echo
+	stty $old_config
 
 	# passphrase が空文字列の場合
 	if [ -z "$passphrase" ]; then
@@ -111,6 +112,7 @@ sign_init() {
 	fi
 
 	# エコーバックを停止させる
+	old_config=$(stty -g)
 	stty -echo
 
 	printf %s 'Enter your passphrase again (invisible): '
@@ -118,7 +120,7 @@ sign_init() {
 	echo
 
 	# エコーバックを再開させる
-	stty echo
+	stty $old_config
 
 	# passphrase と passphrase_again が異なる場合
 	if [ "$passphrase" != "$passphrase_again" ]; then
@@ -286,6 +288,7 @@ sign_migrate() {
 	fi
 
 	# エコーバックを停止させる
+	old_config=$(stty -g)
 	stty -echo
 
 	printf %s 'Enter your old passphrase (invisible): '
@@ -293,7 +296,7 @@ sign_migrate() {
 	echo
 
 	# エコーバックを再開させる
-	stty echo
+	stty $old_config
 
 	# old_passphrase が誤っている場合
 	if [ $(hmac_sha256 "$old_passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
@@ -302,6 +305,7 @@ sign_migrate() {
 	fi
 
 	# エコーバックを停止させる
+	old_config=$(stty -g)
 	stty -echo
 
 	printf %s 'Enter your new passphrase (invisible): '
@@ -313,7 +317,7 @@ sign_migrate() {
 	echo
 
 	# エコーバックを再開させる
-	stty echo
+	stty $old_config
 
 	# new_passphrase と new_passphrase_again が異なる場合
 	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
@@ -362,6 +366,7 @@ copy_password() {
 	if [ -z "$*" ]; then
 
 		# エコーバックを停止させる
+		old_config=$(stty -g)
 		stty -echo
 
 		printf %s 'Enter your passphrase (invisible): '
@@ -369,7 +374,7 @@ copy_password() {
 		echo
 
 		# エコーバックを再開させる
-		stty echo
+		stty $old_config
 	else
 		passphrase=$1 && shift
 	fi

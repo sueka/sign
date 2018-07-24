@@ -1,0 +1,10 @@
+sudo: false
+branches:
+  only:
+    - master
+script:
+  - test/bin/sign_test.sh
+notifications:
+  email:
+    on_success: never
+    on_failure: change

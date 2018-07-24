@@ -29,6 +29,8 @@ LF='
 
 NAME=$(basename "$0")
 
+NO_ANSI=false
+
 #
 # setup
 #
@@ -64,11 +66,23 @@ teardown() {
 }
 
 #
-# test
+# test [--no-ansi]
 #
 test() {
 
 	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		option=$1 && shift
+
+		if [ "$option" = '--no-ansi' ]; then
+			NO_ANSI=true
+		else
+			echo_fatal "Invalid option: '$option'" >&2
+			return $EX_USAGE
+		fi
+	fi
+
+	# 第2オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then
 		return $EX_USAGE
 	fi
@@ -195,9 +209,13 @@ print_colored() {
 	green=$1 && shift
 	blue=$1 && shift
 
-	printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
-	printf %s "$@"
-	printf '\e[0m'
+	if $NO_ANSI; then
+		printf %s "$@"
+	else
+		printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
+		printf %s "$@"
+		printf '\e[0m'
+	fi
 }
 
 # entry

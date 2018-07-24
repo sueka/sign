@@ -23,11 +23,13 @@ NAME=$(basename "$0")
 SIGN_CONFIG_DIR="$HOME/.sign"
 SECRET_KEY='a secret key'
 
+NO_ANSI=false
+
 #
-# main init
-# main register [<service name> [<your ID>]]
-# main get [<service name> [<your ID>]]
-# main migrate
+# main [--no-ansi] init
+# main [--no-ansi] register [<service name> [<your ID>]]
+# main [--no-ansi] get [<service name> [<your ID>]]
+# main [--no-ansi] migrate
 #
 main() {
 
@@ -36,7 +38,20 @@ main() {
 		return $EX_USAGE
 	fi
 
-	subcommand=$1 && shift
+	first_option=$1 && shift
+
+	if [ "$first_option" = '--no-ansi' ]; then
+		NO_ANSI=true
+
+		# 第1オプションが --no-ansi かつ第2オプション無しで呼ばれた場合
+		if [ -z "$*" ]; then
+			return $EX_USAGE
+		fi
+
+		subcommand=$1 && shift
+	else
+		subcommand=$first_option
+	fi
 
 	case "$subcommand" in
 		init )
@@ -446,9 +461,13 @@ print_colored() {
 	green=$1 && shift
 	blue=$1 && shift
 
-	printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
-	printf %s "$@"
-	printf '\e[0m'
+	if $NO_ANSI; then
+		printf %s "$@"
+	else
+		printf '\e[38;2;%d;%d;%dm' "$red" "$green" "$blue"
+		printf %s "$@"
+		printf '\e[0m'
+	fi
 }
 
 #

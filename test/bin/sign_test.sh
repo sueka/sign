@@ -157,7 +157,13 @@ assert() {
 # report_pass [<string> ..]
 #
 report_pass() {
-	echo "[PASS]    $@"
+	string="$@"
+
+	first_line=$(echo "$string" | head -n1)
+	subsequent_lines=$(echo "$string" | tail -n+2)
+
+	echo "[PASS]    $first_line"
+	echo_indented "$subsequent_lines" 10
 }
 
 #
@@ -166,21 +172,53 @@ report_pass() {
 report_failure() {
 	exit_code=$EX_SOFTWARE
 
-	echo "[FAILURE] $@"
+	string="$@"
+
+	first_line=$(echo "$string" | head -n1)
+	subsequent_lines=$(echo "$string" | tail -n+2)
+
+	echo "[FAILURE] $first_line"
+	echo_indented "$subsequent_lines" 10
 }
 
 #
 # echo_info [<string> ..]
 #
 echo_info() {
-	echo "[INFO]    $@"
+	string="$@"
+
+	first_line=$(echo "$string" | head -n1)
+	subsequent_lines=$(echo "$string" | tail -n+2)
+
+	echo "[INFO]    $first_line"
+	echo_indented "$subsequent_lines" 10
 }
 
 #
 # echo_fatal [<string> ..]
 #
 echo_fatal() {
-	echo "[FATAL]   $@"
+	string="$@"
+
+	first_line=$(echo "$string" | head -n1)
+	subsequent_lines=$(echo "$string" | tail -n+2)
+
+	echo "[FATAL]   $first_line"
+	echo_indented "$subsequent_lines" 10
+}
+
+#
+# echo_indented <string> <width>
+#
+echo_indented() {
+	string=$1 && shift
+	width=$1 && shift
+
+	echo "$string" | while IFS= read -r line
+	do
+		printf "%${width}s"
+		echo "$line"
+	done
 }
 
 # entry

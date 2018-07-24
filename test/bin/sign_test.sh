@@ -67,12 +67,16 @@ test() {
 		return $EX_USAGE
 	fi
 
+	exit_code=$EX_OK
+
 	setup
 
 	main_test
 	sign_init_test
 
 	teardown
+
+	return $exit_code
 }
 
 #
@@ -160,6 +164,8 @@ report_pass() {
 # report_failure [<string> ..]
 #
 report_failure() {
+	exit_code=$EX_SOFTWARE
+
 	echo "[FAILURE] $@"
 }
 

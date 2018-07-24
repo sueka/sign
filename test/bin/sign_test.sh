@@ -2,6 +2,10 @@
 
 set -eu
 
+PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
+
+. "$PROJECT_ROOT_DIR/bin/sign.sh"
+
 EX_OK=0
 
 EX_USAGE=64
@@ -34,10 +38,6 @@ setup() {
 	if [ -n "$*" ]; then
 		return $EX_USAGE
 	fi
-
-	PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
-
-	. "$PROJECT_ROOT_DIR/bin/sign.sh"
 
 	mkdir -p "$PROJECT_ROOT_DIR/test/tmp"
 

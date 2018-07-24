@@ -1,5 +1,4 @@
 sudo: false
-language: shell
 branches:
   only:
     - master

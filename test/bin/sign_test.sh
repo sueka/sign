@@ -136,7 +136,7 @@ sign_init_test() {
 }
 
 #
-# assert <command> <expected_exit_status>
+# assert <command> <expected_exit_status> [<expected_stdout> [<expected_stderr>]]
 #
 assert() {
 	command=$1 && shift
@@ -144,14 +144,37 @@ assert() {
 
 	# TODO: $command が実行可能であることを確認する
 
-	actual_exit_status=$(set +e; eval "$command" >/dev/null 2>&1; echo $?)
+	set_current=$(set +o)
+	set +e
+	eval "$command" \
+		1>"$PROJECT_ROOT_DIR/test/tmp/dev/stdout" \
+		2>"$PROJECT_ROOT_DIR/test/tmp/dev/stderr"
+	actual_exit_status=$?
+	eval "$set_current"
+
+	stdout=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stdout")
+	stderr=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stderr")
 
 	if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
 		report_pass "'$command' exited with $actual_exit_status as expected."
 	else
 		report_failure "'$command' is expected to exit with $expected_exit_status, but it exited with $actual_exit_status."
 	fi
+
+	if [ "$actual_stdout" = "$expected_stdout" ]; then
+		report_pass "'$command' printed $actual_stdout as expected."
+	else
+		report_failure "'$command' is expected to print $expected_stdout, but it printed $actual_stdout."
+	fi
+
+	if [ "$actual_stderr" = "$expected_stderr" ]; then
+		report_pass "'$command' printed $actual_stderr as expected."
+	else
+		report_failure "'$command' is expected to print $expected_stderr, but it printed $actual_stderr."
+	fi
 }
+
+
 
 #
 # report_pass [<string> ..]

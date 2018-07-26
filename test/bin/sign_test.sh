@@ -144,6 +144,14 @@ assert() {
 	command=$1 && shift
 	expected_exit_status=$1 && shift
 
+	if [ -n "$*" ]; then
+		expected_stdout=$1 && shift
+
+		if [ -n "$*" ]; then
+			expected_stderr=$1 && shift
+		fi
+	fi
+
 	# TODO: $command が実行可能であることを確認する
 
 	set_current=$(set +o)
@@ -154,8 +162,8 @@ assert() {
 	actual_exit_status=$?
 	eval "$set_current"
 
-	stdout=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stdout")
-	stderr=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stderr")
+	actual_stdout=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stdout")
+	actual_stderr=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stderr")
 
 	if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
 		report_pass "'$command' exited with $actual_exit_status as expected."
@@ -163,16 +171,20 @@ assert() {
 		report_failure "'$command' is expected to exit with $expected_exit_status, but it exited with $actual_exit_status."
 	fi
 
-	if [ "$actual_stdout" = "$expected_stdout" ]; then
-		report_pass "'$command' printed $actual_stdout as expected."
-	else
-		report_failure "'$command' is expected to print $expected_stdout, but it printed $actual_stdout."
+	if ${expected_stdout+:} false; then
+		if [ "$actual_stdout" = "$expected_stdout" ]; then
+			report_pass "'$command' printed $actual_stdout as expected."
+		else
+			report_failure "'$command' is expected to print $expected_stdout, but it printed $actual_stdout."
+		fi
 	fi
 
-	if [ "$actual_stderr" = "$expected_stderr" ]; then
-		report_pass "'$command' printed $actual_stderr as expected."
-	else
-		report_failure "'$command' is expected to print $expected_stderr, but it printed $actual_stderr."
+	if ${expected_stderr+:} false; then
+		if [ "$actual_stderr" = "$expected_stderr" ]; then
+			report_pass "'$command' printed $actual_stderr as expected."
+		else
+			report_failure "'$command' is expected to print $expected_stderr, but it printed $actual_stderr."
+		fi
 	fi
 }
 

@@ -88,7 +88,7 @@ sign_init() {
 	echo
 
 	# エコーバックを再開させる
-	stty $old_config
+	stty "$old_config"
 
 	# passphrase が空文字列の場合
 	if [ -z "$passphrase" ]; then

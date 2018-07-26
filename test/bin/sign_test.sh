@@ -41,6 +41,8 @@ setup() {
 
 	mkdir -p "$PROJECT_ROOT_DIR/test/tmp"
 
+	mkdir -p "$PROJECT_ROOT_DIR/test/tmp/dev"
+
 	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/dummy-stty/bin"':$PATH'
 }
 

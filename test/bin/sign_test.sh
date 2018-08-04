@@ -30,36 +30,6 @@ LF='
 NAME=$(basename "$0")
 
 #
-# setup
-#
-setup() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
-	fi
-
-	mkdir -p "$PROJECT_ROOT_DIR/test/tmp"
-
-	mkdir -p "$PROJECT_ROOT_DIR/test/tmp/dev"
-
-	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/dummy-stty/bin"':$PATH'
-}
-
-#
-# teardown
-#
-teardown() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
-	fi
-
-	rm -r "$PROJECT_ROOT_DIR/test/tmp"
-}
-
-#
 # test
 #
 test() {
@@ -71,12 +41,16 @@ test() {
 
 	exit_code=$EX_OK
 
-	setup
+	mkdir -p "$PROJECT_ROOT_DIR/test/tmp"
+
+	mkdir -p "$PROJECT_ROOT_DIR/test/tmp/dev"
+
+	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/dummy-stty/bin"':$PATH'
 
 	main_test
 	sign_init_test
 
-	teardown
+	rm -r "$PROJECT_ROOT_DIR/test/tmp"
 
 	return $exit_code
 }

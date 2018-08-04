@@ -69,9 +69,11 @@ main_test() {
 }
 
 #
-# teardown_for_each_sign_init_test
+# setup_for_each_sign_init_test
 #
-teardown_for_each_sign_init_test() {
+setup_for_each_sign_init_test() {
+	SIGN_CONFIG_DIR="$PROJECT_ROOT_DIR/test/tmp/home/.sign"
+
 	if [ -d "$SIGN_CONFIG_DIR" ]; then
 		rm -r "$SIGN_CONFIG_DIR"
 	fi
@@ -87,38 +89,36 @@ sign_init_test() {
 		return $EX_USAGE
 	fi
 
-	SIGN_CONFIG_DIR="$PROJECT_ROOT_DIR/test/tmp/home/.sign"
+	setup_for_each_sign_init_test
+	assert "echo 'passphrase${LF}passphrase ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
 
-	assert "echo 'passphrase${LF}passphrase' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
-	teardown_for_each_sign_init_test
-
+	setup_for_each_sign_init_test
 	assert "echo '#${LF}#' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
-	teardown_for_each_sign_init_test
 
+	setup_for_each_sign_init_test
 	assert "echo 'elif${LF}elif' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
-	teardown_for_each_sign_init_test
 
+	setup_for_each_sign_init_test
 	assert "echo '.${LF}.' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
-	teardown_for_each_sign_init_test
 
+	setup_for_each_sign_init_test
 	assert "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
-	teardown_for_each_sign_init_test
 
+	setup_for_each_sign_init_test
 	# passphrase と passphrase_again は完全に一致しなければならない。
-	assert "echo 'passphrase${LF}passphrase ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
-	teardown_for_each_sign_init_test
+	assert "echo 'passphrase${LF}passphrase' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
 
+	setup_for_each_sign_init_test
 	# sign_init はオプションを受け付けない。
 	assert "sign_init :" $EX_USAGE
-	teardown_for_each_sign_init_test
 
+	setup_for_each_sign_init_test
 	# passphrase は空文字列であってはならない。
 	assert "echo '' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
-	teardown_for_each_sign_init_test
 
+	setup_for_each_sign_init_test
 	# passphrase は空白のみでもよい。
 	assert "echo ' $LF ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
-	teardown_for_each_sign_init_test
 }
 
 #

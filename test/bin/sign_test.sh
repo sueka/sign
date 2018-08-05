@@ -190,7 +190,10 @@ report_pass() {
 	subsequent_lines=$(echo "$string" | tail -n+2)
 
 	echo "[PASS]    $first_line"
-	echo_indented "$subsequent_lines" 10
+
+	if [ -n "$subsequent_lines" ]; then
+		echo_indented "$subsequent_lines" 10
+	fi
 }
 
 #
@@ -205,7 +208,10 @@ report_failure() {
 	subsequent_lines=$(echo "$string" | tail -n+2)
 
 	echo "[FAILURE] $first_line"
-	echo_indented "$subsequent_lines" 10
+
+	if [ -n "$subsequent_lines" ]; then
+		echo_indented "$subsequent_lines" 10
+	fi
 }
 
 #
@@ -218,7 +224,10 @@ echo_info() {
 	subsequent_lines=$(echo "$string" | tail -n+2)
 
 	echo "[INFO]    $first_line"
-	echo_indented "$subsequent_lines" 10
+
+	if [ -n "$subsequent_lines" ]; then
+		echo_indented "$subsequent_lines" 10
+	fi
 }
 
 #
@@ -231,7 +240,10 @@ echo_fatal() {
 	subsequent_lines=$(echo "$string" | tail -n+2)
 
 	echo "[FATAL]   $first_line"
-	echo_indented "$subsequent_lines" 10
+
+	if [ -n "$subsequent_lines" ]; then
+		echo_indented "$subsequent_lines" 10
+	fi
 }
 
 #

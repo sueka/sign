@@ -2,6 +2,8 @@
 
 A password manager.
 
+[![Build Status](https://travis-ci.org/sueka/sign.svg?branch=master)](https://travis-ci.org/sueka/sign)
+
 ## Installation
 
 ``` sh

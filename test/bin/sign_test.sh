@@ -72,6 +72,12 @@ main_test() {
 # setup_for_each_sign_init_test
 #
 setup_for_each_sign_init_test() {
+
+	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	SIGN_CONFIG_DIR="$PROJECT_ROOT_DIR/test/tmp/home/.sign"
 
 	if [ -d "$SIGN_CONFIG_DIR" ]; then

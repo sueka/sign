@@ -96,7 +96,7 @@ sign_init_test() {
 	fi
 
 	setup_for_each_sign_init_test
-	assert "echo 'passphrase${LF}passphrase ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
+	assert "echo 'passphrase${LF}passphrase' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
 
 	setup_for_each_sign_init_test
 	assert "echo '#${LF}#' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_OK
@@ -112,7 +112,7 @@ sign_init_test() {
 
 	setup_for_each_sign_init_test
 	# passphrase と passphrase_again は完全に一致しなければならない。
-	assert "echo 'passphrase${LF}passphrase' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
+	assert "echo 'passphrase${LF}passphrase ' | PATH="$PATH_IGNORING_STTY" sign_init" $EX_SOFTWARE
 
 	setup_for_each_sign_init_test
 	# sign_init はオプションを受け付けない。

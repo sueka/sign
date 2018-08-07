@@ -155,7 +155,10 @@ assert() {
 
 	set_current=$(set +o)
 	set +e
-	eval "$command" 1>"$PROJECT_ROOT_DIR/test/tmp/dev/stdout" 2>"$PROJECT_ROOT_DIR/test/tmp/dev/stderr"
+
+	# NOTE: exit する関数を呼ぶと errexit off でも終了してしまうが、パイプラインの一部として呼ぶと回避できる。
+	: | eval "$command" 1>"$PROJECT_ROOT_DIR/test/tmp/dev/stdout" 2>"$PROJECT_ROOT_DIR/test/tmp/dev/stderr"
+
 	actual_exit_status=$?
 	eval "$set_current"
 

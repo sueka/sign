@@ -127,18 +127,31 @@ sign_init() {
 #
 sign_register() {
 
-	# サービス名一覧が存在しない場合、作成する
-	if ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
-		touch "$SIGN_CONFIG_DIR/service_names"
-		chmod 755 "$SIGN_CONFIG_DIR/service_names"
-	fi
-
 	# オプション無しで呼ばれた場合、サービス名を尋ねる
 	if [ -z "$*" ]; then
 		printf %s 'Enter the service name: '
 		read -r service_name
 	else
 		service_name=$1 && shift
+	fi
+
+	# 第2オプション無しで呼ばれた場合、 ID を尋ねる
+	if [ -z "$*" ]; then
+		printf %s "Enter an ID of yours for $service_name: "
+		read -r your_id
+	else
+		your_id=$1 && shift
+	fi
+
+	# 第3オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
+	# サービス名一覧が存在しない場合、作成する
+	if ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
+		touch "$SIGN_CONFIG_DIR/service_names"
+		chmod 755 "$SIGN_CONFIG_DIR/service_names"
 	fi
 
 	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する
@@ -150,14 +163,6 @@ sign_register() {
 
 		touch "$SIGN_CONFIG_DIR/${service_name}_ids"
 		chmod 644 "$SIGN_CONFIG_DIR/${service_name}_ids"
-	fi
-
-	# 第2オプション無しで呼ばれた場合、 ID を尋ねる
-	if [ -z "$*" ]; then
-		printf %s "Enter an ID of yours for $service_name: "
-		read -r your_id
-	else
-		your_id=$1 && shift
 	fi
 
 	# ID がすでに存在する場合

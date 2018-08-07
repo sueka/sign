@@ -210,15 +210,6 @@ sign_get() {
 		service_name=$1 && shift
 	fi
 
-	# 指定されたサービス名がサービス一覧に存在しない場合
-	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
-
-		# TODO: 似たサービス名を表示させる
-
-		echo_fatal "No service '$service_name' found." >&2
-		return $EX_SOFTWARE
-	fi
-
 	# 第2オプション無しで呼ばれた場合、 ID の入力を受け付ける
 	if [ -z "$*" ]; then
 
@@ -243,6 +234,20 @@ sign_get() {
 		fi
 	else
 		your_id=$1 && shift
+	fi
+
+	# 第3オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
+	# 指定されたサービス名がサービス一覧に存在しない場合
+	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
+
+		# TODO: 似たサービス名を表示させる
+
+		echo_fatal "No service '$service_name' found." >&2
+		return $EX_SOFTWARE
 	fi
 
 	# ID が存在しない場合

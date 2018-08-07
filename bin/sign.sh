@@ -374,6 +374,11 @@ copy_password() {
 		passphrase=$1 && shift
 	fi
 
+	# 第4オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	# passphrase が誤っている場合
 	if [ $(hmac_sha256 "$passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
@@ -389,6 +394,11 @@ copy_password() {
 #
 hexadecimal_to_duohexagesimal() {
 	hex=$1 && shift
+
+	# 第2オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
 
 	uppercase_hex=$(printf %s "$hex" | LC_COLLATE=C tr a-z A-Z)
 
@@ -434,6 +444,11 @@ hmac_sha256() {
 	message=$1 && shift
 	secret_key=$1 && shift
 
+	# 第3オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
 }
 
@@ -455,6 +470,12 @@ echo_fatal() {
 # until_enter
 #
 until_enter() {
+
+	# オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
 	while true
 	do
 		printf %s 'Press the enter key. '

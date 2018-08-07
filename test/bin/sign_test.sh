@@ -155,9 +155,7 @@ assert() {
 
 	set_current=$(set +o)
 	set +e
-	eval "$command" \
-		1>"$PROJECT_ROOT_DIR/test/tmp/dev/stdout" \
-		2>"$PROJECT_ROOT_DIR/test/tmp/dev/stderr"
+	eval "$command" 1>"$PROJECT_ROOT_DIR/test/tmp/dev/stdout" 2>"$PROJECT_ROOT_DIR/test/tmp/dev/stderr"
 	actual_exit_status=$?
 	eval "$set_current"
 

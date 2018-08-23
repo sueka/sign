@@ -324,9 +324,9 @@ sign_migrate() {
 
 	echo "$(hmac_sha256 "$new_passphrase" 'a secret key')" >"$SIGN_CONFIG_DIR/passphrase"
 
-	for service_name in $(cat "$SIGN_CONFIG_DIR/service_names")
+	cat "$SIGN_CONFIG_DIR/service_names" | while read -r service_name
 	do
-		for your_id in $(cat "$SIGN_CONFIG_DIR/${service_name}_ids")
+		cat "$SIGN_CONFIG_DIR/${service_name}_ids" | while read -r your_id
 		do
 			echo_info "Changing your password for $service_name ID '$your_id'.."
 
@@ -406,9 +406,9 @@ hexadecimal_to_duohexagesimal() {
 
 	dec=$(echo "ibase=16; $uppercase_hex" | bc_with_no_linefeeds)
 
-	duohexagesimal_digits=$(echo "obase=62; $dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds | tr '\n' ' ')
+	duohexagesimal_digits=$(echo "obase=62; $dec" | bc_with_no_linefeeds | tr ' ' '\n' | bc_with_no_linefeeds)
 
-	for i in $duohexagesimal_digits
+	echo "$duohexagesimal_digits" | while read i
 	do
 		if [ 0 -le "$i" ] && [ "$i" -le 9 ]; then
 			charcode=$(echo "$i - 0 + 48" | bc)
@@ -481,7 +481,7 @@ until_enter() {
 	while true
 	do
 		printf %s 'Press the enter key. '
-		IFS= read dummy
+		IFS= read dummy </dev/tty
 
 		if [ -z "$dummy" ]; then
 			break

@@ -184,16 +184,35 @@ sign_register() {
 #
 sign_get() {
 
-	# オプション無しで呼ばれた場合、サービス名の入力を受け付ける
-	if [ -z "$*" ]; then
+	# 第1オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		service_name=$1 && shift
+	else
+		service_name=
+	fi
+
+	# 第2オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		your_id=$1 && shift
+	else
+		your_id=
+	fi
+
+	# 第3オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
+	# 指定されたサービス名がサービス一覧に存在しない場合
+	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
 
 		# peco または percol がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
 		if command -v peco 1>/dev/null; then
-			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | peco)
+			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | peco --query "$service_name")
 
 			echo "Service '$service_name' chosen."
 		elif command -v percol 1>/dev/null; then
-			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | percol)
+			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | percol --query "$service_name")
 
 			echo "Service '$service_name' chosen."
 		else
@@ -206,20 +225,18 @@ sign_get() {
 			printf %s 'Enter the service name: '
 			read -r service_name
 		fi
-	else
-		service_name=$1 && shift
 	fi
 
-	# 第2オプション無しで呼ばれた場合、 ID の入力を受け付ける
-	if [ -z "$*" ]; then
+	# ID が存在しない場合
+	if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
 
 		# peco または percol がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
 		if command -v peco 1>/dev/null; then
-			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | peco)
+			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | peco --query "$your_id")
 
 			echo "$service_name ID '$your_id' chosen."
 		elif command -v percol 1>/dev/null; then
-			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | percol)
+			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | percol --query "$your_id")
 
 			echo "$service_name ID '$your_id' chosen."
 		else
@@ -232,31 +249,6 @@ sign_get() {
 			printf %s "Enter an ID of yours for $service_name: "
 			read -r your_id
 		fi
-	else
-		your_id=$1 && shift
-	fi
-
-	# 第3オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
-	fi
-
-	# 指定されたサービス名がサービス一覧に存在しない場合
-	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
-
-		# TODO: 似たサービス名を表示させる
-
-		echo_fatal "No service '$service_name' found." >&2
-		return $EX_SOFTWARE
-	fi
-
-	# ID が存在しない場合
-	if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
-
-		# TODO: 似た ID を表示させる
-
-		echo_fatal "No $service_name ID '$your_id' found." >&2
-		return $EX_SOFTWARE
 	fi
 
 	printf %s "$your_id" | xsel -bi

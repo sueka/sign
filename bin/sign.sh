@@ -189,39 +189,8 @@ sign_get() {
 		service_name=$1 && shift
 	else
 		service_name=
-	fi
 
-	# 第2オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		your_id=$1 && shift
-	else
-		your_id=
-	fi
-
-	# 第3オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
-	fi
-
-	# 指定されたサービス名がサービス一覧に存在しない場合
-	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
-
-		# peco または percol がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
-		if command -v peco 1>/dev/null; then
-			service_name=$(
-				cat "$SIGN_CONFIG_DIR/service_names" |
-				peco --query "$service_name" --prompt 'Enter the service name: '
-			)
-
-			echo "Service '$service_name' chosen."
-		elif command -v percol 1>/dev/null; then
-			service_name=$(
-				cat "$SIGN_CONFIG_DIR/service_names" |
-				percol --query "$service_name" --prompt 'Enter the service name: '
-			)
-
-			echo "Service '$service_name' chosen."
-		else
+		if ! command -v peco percol 1>/dev/null; then
 			echo 'Choose a service:'
 
 			echo
@@ -233,25 +202,13 @@ sign_get() {
 		fi
 	fi
 
-	# ID が存在しない場合
-	if ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
+	# 第2オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		your_id=$1 && shift
+	else
+		your_id=
 
-		# peco または percol がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
-		if command -v peco 1>/dev/null; then
-			your_id=$(
-				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
-				peco --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
-			)
-
-			echo "$service_name ID '$your_id' chosen."
-		elif command -v percol 1>/dev/null; then
-			your_id=$(
-				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
-				percol --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
-			)
-
-			echo "$service_name ID '$your_id' chosen."
-		else
+		if ! command -v peco percol 1>/dev/null; then
 			echo "Choose your $service_name ID:"
 
 			echo
@@ -262,6 +219,47 @@ sign_get() {
 			read -r your_id
 		fi
 	fi
+
+	# 第3オプション付きで呼ばれた場合
+	if [ -n "$*" ]; then
+		return $EX_USAGE
+	fi
+
+	# 指定されたサービス名がサービス一覧に存在しない場合
+	while ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null
+	do
+		if command -v peco 1>/dev/null; then
+			service_name=$(
+				cat "$SIGN_CONFIG_DIR/service_names" |
+				peco --query "$service_name" --prompt 'Enter the service name: '
+			)
+		elif command -v percol 1>/dev/null; then
+			service_name=$(
+				cat "$SIGN_CONFIG_DIR/service_names" |
+				percol --query "$service_name" --prompt 'Enter the service name: '
+			)
+		fi
+	done
+
+	echo "Service '$service_name' chosen."
+
+	# ID が存在しない場合
+	while ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null
+	do
+		if command -v peco 1>/dev/null; then
+			your_id=$(
+				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
+				peco --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
+			)
+		elif command -v percol 1>/dev/null; then
+			your_id=$(
+				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
+				percol --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
+			)
+		fi
+	done
+
+	echo "$service_name ID '$your_id' chosen."
 
 	printf %s "$your_id" | xsel -bi
 	echo_info 'Your ID is stored in the clipboard.'

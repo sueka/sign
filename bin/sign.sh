@@ -105,7 +105,7 @@ sign_init() {
 	echo
 
 	# エコーバックを再開させる
-	stty $old_config
+	stty "$old_config"
 
 	# passphrase と passphrase_again が異なる場合
 	if [ "$passphrase" != "$passphrase_again" ]; then
@@ -119,7 +119,7 @@ sign_init() {
 	touch "$SIGN_CONFIG_DIR/passphrase"
 	chmod 600 "$SIGN_CONFIG_DIR/passphrase"
 
-	echo $(hmac_sha256 "$passphrase" "$SECRET_KEY") >"$SIGN_CONFIG_DIR/passphrase"
+	echo "$(hmac_sha256 "$passphrase" "$SECRET_KEY")" >"$SIGN_CONFIG_DIR/passphrase"
 }
 
 #
@@ -293,7 +293,7 @@ sign_migrate() {
 	echo
 
 	# エコーバックを再開させる
-	stty $old_config
+	stty "$old_config"
 
 	# old_passphrase が誤っている場合
 	if [ $(hmac_sha256 "$old_passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
@@ -314,7 +314,7 @@ sign_migrate() {
 	echo
 
 	# エコーバックを再開させる
-	stty $old_config
+	stty "$old_config"
 
 	# new_passphrase と new_passphrase_again が異なる場合
 	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
@@ -322,7 +322,7 @@ sign_migrate() {
 		return $EX_SOFTWARE
 	fi
 
-	echo $(hmac_sha256 "$new_passphrase" 'a secret key') >"$SIGN_CONFIG_DIR/passphrase"
+	echo "$(hmac_sha256 "$new_passphrase" 'a secret key')" >"$SIGN_CONFIG_DIR/passphrase"
 
 	for service_name in $(cat "$SIGN_CONFIG_DIR/service_names")
 	do
@@ -371,10 +371,10 @@ copy_password() {
 		echo
 
 		# エコーバックを再開させる
-		stty $old_config
+		stty "$old_config"
 
 		# 入力された passphrase が誤っている場合
-		if [ $(hmac_sha256 "$passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+		if [ "$(hmac_sha256 "$passphrase" "$SECRET_KEY")" != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 			echo_fatal 'Passphrase is wrong.' >&2
 			return $EX_SOFTWARE
 		fi
@@ -451,7 +451,7 @@ hmac_sha256() {
 		return $EX_USAGE
 	fi
 
-	printf %s $(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')
+	printf %s "$(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')"
 }
 
 #

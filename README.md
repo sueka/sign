@@ -8,7 +8,7 @@ A password manager.
 
 ``` sh
 sudo mkdir -p /opt/local
-sudo chown $USER:$(id -gn $USER) /opt/local
+sudo chmod uo+rwx /opt/local
 
 git clone --depth=1 https://github.com/sueka/sign.git /opt/local/sign
 

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 EX_OK=0
 EX_USAGE=64

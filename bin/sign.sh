@@ -208,11 +208,17 @@ sign_get() {
 
 		# peco または percol がある場合は対話的に取得し、無い場合はサービス名一覧を表示してから read する
 		if command -v peco 1>/dev/null; then
-			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | peco --query "$service_name")
+			service_name=$(
+				cat "$SIGN_CONFIG_DIR/service_names" |
+				peco --query "$service_name" --prompt 'Enter the service name: '
+			)
 
 			echo "Service '$service_name' chosen."
 		elif command -v percol 1>/dev/null; then
-			service_name=$(cat "$SIGN_CONFIG_DIR/service_names" | percol --query "$service_name")
+			service_name=$(
+				cat "$SIGN_CONFIG_DIR/service_names" |
+				percol --query "$service_name" --prompt 'Enter the service name: '
+			)
 
 			echo "Service '$service_name' chosen."
 		else
@@ -232,11 +238,17 @@ sign_get() {
 
 		# peco または percol がある場合は対話的に取得し、無い場合は ID 一覧を表示してから read する
 		if command -v peco 1>/dev/null; then
-			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | peco --query "$your_id")
+			your_id=$(
+				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
+				peco --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
+			)
 
 			echo "$service_name ID '$your_id' chosen."
 		elif command -v percol 1>/dev/null; then
-			your_id=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids" | percol --query "$your_id")
+			your_id=$(
+				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
+				percol --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
+			)
 
 			echo "$service_name ID '$your_id' chosen."
 		else

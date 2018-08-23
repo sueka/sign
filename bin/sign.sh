@@ -372,6 +372,12 @@ copy_password() {
 
 		# エコーバックを再開させる
 		stty $old_config
+
+		# 入力された passphrase が誤っている場合
+		if [ $(hmac_sha256 "$passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+			echo_fatal 'Passphrase is wrong.' >&2
+			return $EX_SOFTWARE
+		fi
 	else
 		passphrase=$1 && shift
 	fi
@@ -379,12 +385,6 @@ copy_password() {
 	# 第4オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then
 		return $EX_USAGE
-	fi
-
-	# passphrase が誤っている場合
-	if [ $(hmac_sha256 "$passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
-		echo_fatal 'Passphrase is wrong.' >&2
-		return $EX_SOFTWARE
 	fi
 
 	password=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")

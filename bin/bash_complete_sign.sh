@@ -22,7 +22,11 @@ _complete_sign() {
 	# $COMP_CWORD >= 1
 
 	if (( $COMP_CWORD == 1 )); then
-		COMPREPLY=($(compgen -W "init register get migrate" -- "$cur"))
+		if ! [ -d "$SIGN_CONFIG_DIR" ]; then
+			COMPREPLY=($(compgen -W "init" -- "$cur"))
+		else
+			COMPREPLY=($(compgen -W "register get migrate" -- "$cur"))
+		fi
 
 		return $EX_OK
 	fi

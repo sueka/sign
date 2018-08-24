@@ -24,6 +24,8 @@ _complete_sign() {
 	if (( $COMP_CWORD == 1 )); then
 		if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 			COMPREPLY=($(compgen -W "init" -- "$cur"))
+		elif ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
+			COMPREPLY=($(compgen -W "register migrate" -- "$cur"))
 		else
 			COMPREPLY=($(compgen -W "register get migrate" -- "$cur"))
 		fi
@@ -33,7 +35,16 @@ _complete_sign() {
 
 	if (( $COMP_CWORD == 2 )); then
 		case "$subcommand" in
-			'register' | 'get' )
+			'register' )
+				if [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
+					service_names=$(cat "$SIGN_CONFIG_DIR/service_names")
+					COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
+				fi
+
+				return $EX_OK
+			;;
+
+			'get' )
 				service_names=$(cat "$SIGN_CONFIG_DIR/service_names")
 				COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
 

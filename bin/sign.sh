@@ -190,7 +190,7 @@ sign_get() {
 	else
 		service_name=
 
-		if ! command -v peco percol 1>/dev/null; then
+		if ! command -v peco 1>/dev/null && ! command -v percol 1>/dev/null; then
 			echo 'Choose a service:'
 
 			echo
@@ -208,7 +208,7 @@ sign_get() {
 	else
 		your_id=
 
-		if ! command -v peco percol 1>/dev/null; then
+		if ! command -v peco 1>/dev/null && ! command -v percol 1>/dev/null; then
 			echo "Choose your $service_name ID:"
 
 			echo

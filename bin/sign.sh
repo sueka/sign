@@ -236,7 +236,7 @@ sign_get() {
 		elif command -v percol 1>/dev/null; then
 			service_name=$(
 				cat "$SIGN_CONFIG_DIR/service_names" |
-				percol --query "$service_name" --prompt 'Enter the service name: '
+				percol --query "$service_name" --prompt 'Enter the service name:  %q'
 			)
 		fi
 	done
@@ -254,7 +254,7 @@ sign_get() {
 		elif command -v percol 1>/dev/null; then
 			your_id=$(
 				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
-				percol --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
+				percol --query "$your_id" --prompt "Enter an ID of yours for $service_name:  %q"
 			)
 		fi
 	done

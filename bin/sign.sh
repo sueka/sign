@@ -225,23 +225,27 @@ sign_get() {
 		return $EX_USAGE
 	fi
 
+	given_service_name=$service_name
+
 	# 指定されたサービス名がサービス一覧に存在しない場合
 	while ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null
 	do
 		if command -v peco 1>/dev/null; then
 			service_name=$(
 				cat "$SIGN_CONFIG_DIR/service_names" |
-				peco --query "$service_name" --prompt 'Enter the service name: '
+				peco --query "$given_service_name" --prompt 'Enter the service name: '
 			)
 		elif command -v percol 1>/dev/null; then
 			service_name=$(
 				cat "$SIGN_CONFIG_DIR/service_names" |
-				percol --query "$service_name" --prompt 'Enter the service name:  %q'
+				percol --query "$given_service_name" --prompt 'Enter the service name:  %q'
 			)
 		fi
 	done
 
 	echo_info "Service '$service_name' chosen."
+
+	your_given_id=$your_id
 
 	# ID が存在しない場合
 	while ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null
@@ -249,12 +253,12 @@ sign_get() {
 		if command -v peco 1>/dev/null; then
 			your_id=$(
 				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
-				peco --query "$your_id" --prompt "Enter an ID of yours for $service_name: "
+				peco --query "$your_given_id" --prompt "Enter an ID of yours for $service_name: "
 			)
 		elif command -v percol 1>/dev/null; then
 			your_id=$(
 				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
-				percol --query "$your_id" --prompt "Enter an ID of yours for $service_name:  %q"
+				percol --query "$your_given_id" --prompt "Enter an ID of yours for $service_name:  %q"
 			)
 		fi
 	done

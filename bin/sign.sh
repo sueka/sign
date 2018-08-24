@@ -241,7 +241,7 @@ sign_get() {
 		fi
 	done
 
-	echo "Service '$service_name' chosen."
+	echo_info "Service '$service_name' chosen."
 
 	# ID が存在しない場合
 	while ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null
@@ -259,7 +259,7 @@ sign_get() {
 		fi
 	done
 
-	echo "$service_name ID '$your_id' chosen."
+	echo_info "$service_name ID '$your_id' chosen."
 
 	printf %s "$your_id" | xsel -bi
 	echo_info 'Your ID is stored in the clipboard.'

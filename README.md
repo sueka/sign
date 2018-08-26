@@ -35,15 +35,7 @@ git pull origin master
 - `xsel`
 - `peco` or `percol` (optional)
 
----
-
-Executing `sign init` asks your passphrase and stores it (hashed) in "$HOME/.sign/passphrase".
-
-When you sign up, use `sign register`.
-
-When you sign in, use `sign get`.
-
-To change your passphrase, use `sign migrate`.
+Enabling the Bash auto completion, type `sign ` and hit the <kbd>Tab</kbd> twice.
 
 ## License
 

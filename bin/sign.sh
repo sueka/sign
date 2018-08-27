@@ -24,6 +24,27 @@ SIGN_CONFIG_DIR="$HOME/.sign"
 SECRET_KEY='a secret key'
 
 #
+# check_dependencies
+#
+check_dependencies() {
+	ex=$EX_OK
+
+	# openssl が無い場合
+	if ! command -v openssl 1>/dev/null; then
+		echo_fatal "No command 'openssl' found." >&2
+		ex=$EX_UNAVAILABLE
+	fi
+
+	# xsel が無い場合
+	if ! command -v xsel 1>/dev/null; then
+		echo_fatal "No command 'xsel' found." >&2
+		ex=$EX_UNAVAILABLE
+	fi
+
+	return $ex
+}
+
+#
 # main init
 # main register [<service name> [<your ID>]]
 # main get [<service name> [<your ID>]]
@@ -353,13 +374,6 @@ sign_migrate() {
 # copy_password <service name> <your id> [<passphrase>]
 #
 copy_password() {
-
-	# xsel が無い場合
-	if ! command -v xsel 1>/dev/null; then
-		echo_fatal "No command 'xsel' found." >&2
-		return $EX_UNAVAILABLE
-	fi
-
 	service_name=$1 && shift
 	your_id=$1 && shift
 
@@ -440,13 +454,6 @@ bc_with_no_linefeeds() {
 # hmac_sha256 <message> <secret key>
 #
 hmac_sha256() {
-
-	# openssl が無い場合
-	if ! command -v openssl 1>/dev/null; then
-		echo_fatal "No command 'openssl' found." >&2
-		return $EX_UNAVAILABLE
-	fi
-
 	message=$1 && shift
 	secret_key=$1 && shift
 
@@ -496,14 +503,17 @@ until_enter() {
 # entry
 case "$NAME" in
 	sign )
+		check_dependencies
 		main "$@"
 	;;
 
 	sign.sh )
+		check_dependencies
 		main "$@"
 	;;
 
 	sign_test.sh )
+		check_dependencies
 	;;
 
 	* )

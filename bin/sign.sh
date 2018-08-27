@@ -23,7 +23,6 @@ EX_CONFIG=78
 NAME=$(basename "$0")
 
 SIGN_CONFIG_DIR="$HOME/.sign"
-SECRET_KEY='a secret key'
 
 #
 # check_dependencies
@@ -102,6 +101,9 @@ sign_init() {
 		return $EX_SOFTWARE
 	fi
 
+	# secret_key を生成する
+	secret_key=$(tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
+
 	# エコーバックを停止させる
 	old_config=$(stty -g)
 	stty -echo
@@ -139,10 +141,14 @@ sign_init() {
 	mkdir -p "$SIGN_CONFIG_DIR"
 	chmod 700 "$SIGN_CONFIG_DIR"
 
+	touch "$SIGN_CONFIG_DIR/secret_key"
+	chmod 600 "$SIGN_CONFIG_DIR/secret_key"
+
 	touch "$SIGN_CONFIG_DIR/passphrase"
 	chmod 600 "$SIGN_CONFIG_DIR/passphrase"
 
-	echo "$(hmac_sha256 "$passphrase" "$SECRET_KEY")" >"$SIGN_CONFIG_DIR/passphrase"
+	echo "$secret_key" >"$SIGN_CONFIG_DIR/secret_key"
+	echo "$(hmac_sha256 "$passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
 }
 
 #
@@ -311,6 +317,8 @@ sign_migrate() {
 		return $EX_IOERR
 	fi
 
+	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
+
 	# エコーバックを停止させる
 	old_config=$(stty -g)
 	stty -echo
@@ -323,7 +331,7 @@ sign_migrate() {
 	stty "$old_config"
 
 	# old_passphrase が誤っている場合
-	if [ $(hmac_sha256 "$old_passphrase" "$SECRET_KEY") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+	if [ $(hmac_sha256 "$old_passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
@@ -349,7 +357,7 @@ sign_migrate() {
 		return $EX_SOFTWARE
 	fi
 
-	echo "$(hmac_sha256 "$new_passphrase" 'a secret key')" >"$SIGN_CONFIG_DIR/passphrase"
+	echo "$(hmac_sha256 "$new_passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
 
 	cat "$SIGN_CONFIG_DIR/service_names" | while read -r service_name
 	do
@@ -381,6 +389,7 @@ copy_password() {
 
 	# 第3オプション無しで呼ばれた場合、 passphrase を尋ねる
 	if [ -z "$*" ]; then
+		secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
 
 		# エコーバックを停止させる
 		old_config=$(stty -g)
@@ -394,7 +403,7 @@ copy_password() {
 		stty "$old_config"
 
 		# 入力された passphrase が誤っている場合
-		if [ "$(hmac_sha256 "$passphrase" "$SECRET_KEY")" != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+		if [ "$(hmac_sha256 "$passphrase" "$secret_key")" != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
 			echo_fatal 'Passphrase is wrong.' >&2
 			return $EX_SOFTWARE
 		fi

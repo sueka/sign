@@ -134,6 +134,9 @@ sign_init() {
 	touch "$SIGN_CONFIG_DIR/passphrase"
 	chmod 600 "$SIGN_CONFIG_DIR/passphrase"
 
+	touch "$SIGN_CONFIG_DIR/service_names"
+	chmod 604 "$SIGN_CONFIG_DIR/service_names"
+
 	echo "$secret_key" >"$SIGN_CONFIG_DIR/secret_key"
 	echo "$(hmac_sha256 "$passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
 }
@@ -162,12 +165,6 @@ sign_register() {
 	# 第3オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then
 		return $EX_USAGE
-	fi
-
-	# サービス名一覧が存在しない場合、作成する
-	if ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
-		touch "$SIGN_CONFIG_DIR/service_names"
-		chmod 755 "$SIGN_CONFIG_DIR/service_names"
 	fi
 
 	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する

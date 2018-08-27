@@ -112,19 +112,6 @@ sign_init() {
 	IFS= read -r passphrase
 	echo
 
-	# エコーバックを再開させる
-	stty "$old_config"
-
-	# passphrase が空文字列の場合
-	if [ -z "$passphrase" ]; then
-		echo_fatal 'Passphrase should not be blank.' >&2
-		return $EX_SOFTWARE
-	fi
-
-	# エコーバックを停止させる
-	old_config=$(stty -g)
-	stty -echo
-
 	printf %s 'Enter your passphrase again (invisible): '
 	IFS= read -r passphrase_again
 	echo

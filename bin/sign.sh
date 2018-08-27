@@ -362,6 +362,8 @@ sign_migrate() {
 			until_enter
 		done
 	done
+
+	echo_info 'Your passphrase is successfully changed.'
 }
 
 #

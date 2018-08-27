@@ -128,8 +128,8 @@ sign_init_test() {
 	assert "$sign_init_test_command :" $EX_USAGE
 
 	setup_for_each_sign_init_test
-	# passphrase は空文字列であってはならない。
-	assert "echo '' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
+	# passphrase は空文字列であってもよい。
+	assert "echo '' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
 	# passphrase は空白のみでもよい。

@@ -24,7 +24,7 @@ _complete_sign() {
 	if (( $COMP_CWORD == 1 )); then
 		if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 			COMPREPLY=($(compgen -W "init" -- "$cur"))
-		elif ! [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
+		elif ! [ -f "$SIGN_CONFIG_DIR/services" ]; then
 			COMPREPLY=($(compgen -W "register migrate" -- "$cur"))
 		else
 			COMPREPLY=($(compgen -W "register get migrate" -- "$cur"))
@@ -36,8 +36,8 @@ _complete_sign() {
 	if (( $COMP_CWORD == 2 )); then
 		case "$subcommand" in
 			'register' )
-				if [ -f "$SIGN_CONFIG_DIR/service_names" ]; then
-					service_names=$(cat "$SIGN_CONFIG_DIR/service_names")
+				if [ -f "$SIGN_CONFIG_DIR/services" ]; then
+					service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 					COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
 				fi
 
@@ -45,7 +45,7 @@ _complete_sign() {
 			;;
 
 			'get' )
-				service_names=$(cat "$SIGN_CONFIG_DIR/service_names")
+				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
 
 				return $EX_OK
@@ -64,7 +64,7 @@ _complete_sign() {
 	if (( $COMP_CWORD == 3 )); then
 		case "$subcommand" in
 			'get' )
-				service_names=$(cat "$SIGN_CONFIG_DIR/service_names")
+				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				service_name=$operand_1
 
 				if ! echo "$service_names" | grep "^$service_name\$" 1>/dev/null; then

@@ -134,8 +134,8 @@ sign_init() {
 	touch "$SIGN_CONFIG_DIR/passphrase"
 	chmod 600 "$SIGN_CONFIG_DIR/passphrase"
 
-	touch "$SIGN_CONFIG_DIR/service_names"
-	chmod 604 "$SIGN_CONFIG_DIR/service_names"
+	touch "$SIGN_CONFIG_DIR/services"
+	chmod 604 "$SIGN_CONFIG_DIR/services"
 
 	echo "$secret_key" >"$SIGN_CONFIG_DIR/secret_key"
 	echo "$(hmac_sha256 "$passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
@@ -168,11 +168,29 @@ sign_register() {
 	fi
 
 	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する
-	if ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null; then
+	if ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep "^$service_name\$" 1>/dev/null; then
 
 		# TODO: 似たサービス名を表示させる
 
-		echo "$service_name" >>"$SIGN_CONFIG_DIR/service_names"
+		# パスワードの長さを尋ねる
+		printf "Enter the password length you need (1-44) [44]: "
+		read password_length
+
+		if [ -z "$password_length" ]; then
+			password_length=44
+		fi
+
+		if ! [ "$password_length" -eq "$password_length" ]; then
+			echo_fatal 'The password length must be an integer.'
+			return $EX_USAGE
+		fi
+
+		if ! [ 1 -le "$password_length" ] || ! [ "$password_length" -le 44 ]; then
+			echo_fatal 'The password length must be between 1 and 44.'
+			return $EX_USAGE
+		fi
+
+		echo "$service_name	$password_length" >>"$SIGN_CONFIG_DIR/services"
 
 		touch "$SIGN_CONFIG_DIR/${service_name}_ids"
 		chmod 644 "$SIGN_CONFIG_DIR/${service_name}_ids"
@@ -207,7 +225,7 @@ sign_get() {
 			echo 'Choose a service:'
 
 			echo
-			cat "$SIGN_CONFIG_DIR/service_names" | sed 's/^/  /'
+			cut -f1 "$SIGN_CONFIG_DIR/services" | sed 's/^/  /'
 			echo
 
 			printf %s 'Enter the service name: '
@@ -241,16 +259,16 @@ sign_get() {
 	given_service_name=$service_name
 
 	# 指定されたサービス名がサービス一覧に存在しない場合
-	while ! grep "^$service_name\$" "$SIGN_CONFIG_DIR/service_names" 1>/dev/null
+	while ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep "^$service_name\$" 1>/dev/null
 	do
 		if command -v peco 1>/dev/null; then
 			service_name=$(
-				cat "$SIGN_CONFIG_DIR/service_names" |
+				cut -f1 "$SIGN_CONFIG_DIR/services" |
 				peco --query "$given_service_name" --prompt 'Enter the service name: '
 			)
 		elif command -v percol 1>/dev/null; then
 			service_name=$(
-				cat "$SIGN_CONFIG_DIR/service_names" |
+				cut -f1 "$SIGN_CONFIG_DIR/services" |
 				percol --query "$given_service_name" --prompt 'Enter the service name:  %q'
 			)
 		fi
@@ -343,7 +361,7 @@ sign_migrate() {
 
 	echo "$(hmac_sha256 "$new_passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
 
-	cat "$SIGN_CONFIG_DIR/service_names" | while read -r service_name
+	cut -f1 "$SIGN_CONFIG_DIR/services" | while read -r service_name
 	do
 		cat "$SIGN_CONFIG_DIR/${service_name}_ids" | while read -r your_id
 		do
@@ -402,7 +420,12 @@ copy_password() {
 		return $EX_USAGE
 	fi
 
-	password=$(hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")")
+	password_length="$(grep "^$service_name	" "$SIGN_CONFIG_DIR/services" | cut -f2)"
+
+	password=$(
+		hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")" |
+		cut -c"-$password_length"
+	)
 	printf %s "$password" | xsel -bi
 }
 

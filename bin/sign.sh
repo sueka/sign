@@ -146,6 +146,12 @@ sign_init() {
 #
 sign_register() {
 
+	# $SIGN_CONFIG_DIR が存在しない場合
+	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
+		echo_fatal 'Not initialized.' >&2
+		return $EX_IOERR
+	fi
+
 	# オプション無しで呼ばれた場合、サービス名を尋ねる
 	if [ -z "$*" ]; then
 		printf %s 'Enter the service name: '
@@ -214,6 +220,12 @@ sign_register() {
 # sign_get [<service name> [<your ID>]]
 #
 sign_get() {
+
+	# $SIGN_CONFIG_DIR が存在しない場合
+	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
+		echo_fatal 'Not initialized.' >&2
+		return $EX_IOERR
+	fi
 
 	# 第1オプション付きで呼ばれた場合
 	if [ -n "$*" ]; then

@@ -39,7 +39,7 @@ test() {
 		return $EX_USAGE
 	fi
 
-	exit_code=$EX_OK
+	ex=$EX_OK
 
 	mkdir -p "$PROJECT_ROOT_DIR/test/tmp"
 
@@ -52,7 +52,7 @@ test() {
 
 	rm -r "$PROJECT_ROOT_DIR/test/tmp"
 
-	return $exit_code
+	return $ex
 }
 
 #
@@ -210,7 +210,7 @@ report_pass() {
 # report_failure [<string> ..]
 #
 report_failure() {
-	exit_code=$EX_SOFTWARE
+	ex=$EX_SOFTWARE
 
 	string="$@"
 

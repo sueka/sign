@@ -228,40 +228,18 @@ sign_get() {
 		return $EX_SOFTWARE
 	fi
 
-	# 第1オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		service_name=$1 && shift
-	else
+	# 第1オプション無しで呼ばれた場合
+	if [ -z "$*" ]; then
 		service_name=
-
-		if ! command -v peco 1>/dev/null && ! command -v percol 1>/dev/null; then
-			echo 'Choose a service:'
-
-			echo
-			cut -f1 "$SIGN_CONFIG_DIR/services" | sed 's/^/  /'
-			echo
-
-			printf %s 'Enter the service name: '
-			read -r service_name
-		fi
+	else
+		service_name=$1 && shift
 	fi
 
-	# 第2オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		your_id=$1 && shift
-	else
+	# 第2オプション無しで呼ばれた場合
+	if [ -z "$*" ]; then
 		your_id=
-
-		if ! command -v peco 1>/dev/null && ! command -v percol 1>/dev/null; then
-			echo "Choose your $service_name ID:"
-
-			echo
-			cat "$SIGN_CONFIG_DIR/${service_name}_ids" | sed 's/^/  /'
-			echo
-
-			printf %s "Enter an ID of yours for $service_name: "
-			read -r your_id
-		fi
+	else
+		your_id=$1 && shift
 	fi
 
 	given_service_name=$service_name
@@ -279,6 +257,15 @@ sign_get() {
 				cut -f1 "$SIGN_CONFIG_DIR/services" |
 				percol --query "$given_service_name" --prompt 'Enter the service name:  %q'
 			)
+		else
+			echo 'Choose a service:'
+
+			echo
+			cut -f1 "$SIGN_CONFIG_DIR/services" | sed 's/^/  /'
+			echo
+
+			printf %s 'Enter the service name: '
+			read -r service_name
 		fi
 	done
 
@@ -299,6 +286,15 @@ sign_get() {
 				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
 				percol --query "$your_given_id" --prompt "Enter an ID of yours for $service_name:  %q"
 			)
+		else
+			echo "Choose your $service_name ID:"
+
+			echo
+			cat "$SIGN_CONFIG_DIR/${service_name}_ids" | sed 's/^/  /'
+			echo
+
+			printf %s "Enter an ID of yours for $service_name: "
+			read -r your_id
 		fi
 	done
 

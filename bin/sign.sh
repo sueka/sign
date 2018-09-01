@@ -121,6 +121,8 @@ sign_init() {
 	# secret_key を生成する
 	secret_key=$(tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
 
+	# TODO: BEGIN TRANSACTION
+
 	mkdir -p "$SIGN_CONFIG_DIR"
 	chmod 700 "$SIGN_CONFIG_DIR"
 
@@ -135,6 +137,8 @@ sign_init() {
 
 	echo "$secret_key" >"$SIGN_CONFIG_DIR/secret_key"
 	echo "$(hmac_sha256 "$passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
+
+	# TODO: COMMIT
 }
 
 #

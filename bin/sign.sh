@@ -129,14 +129,14 @@ sign_init() {
 	touch "$SIGN_CONFIG_DIR/secret_key"
 	chmod 600 "$SIGN_CONFIG_DIR/secret_key"
 
-	touch "$SIGN_CONFIG_DIR/passphrase"
-	chmod 600 "$SIGN_CONFIG_DIR/passphrase"
+	touch "$SIGN_CONFIG_DIR/passphrase_hmac"
+	chmod 600 "$SIGN_CONFIG_DIR/passphrase_hmac"
 
 	touch "$SIGN_CONFIG_DIR/services"
 	chmod 604 "$SIGN_CONFIG_DIR/services"
 
 	echo "$secret_key" >"$SIGN_CONFIG_DIR/secret_key"
-	echo "$(hmac_sha256 "$passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
+	echo "$(hmac_sha256 "$passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase_hmac"
 
 	# TODO: COMMIT
 }
@@ -169,7 +169,7 @@ sign_register() {
 	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
 
 	# passphrase が誤っている場合
-	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase_hmac")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
@@ -261,7 +261,7 @@ sign_get() {
 	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
 
 	# passphrase が誤っている場合
-	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase_hmac")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
@@ -373,7 +373,7 @@ sign_migrate() {
 	stty "$old_config"
 
 	# old_passphrase が誤っている場合
-	if [ $(hmac_sha256 "$old_passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+	if [ $(hmac_sha256 "$old_passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase_hmac")" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
@@ -399,7 +399,7 @@ sign_migrate() {
 		return $EX_SOFTWARE
 	fi
 
-	echo "$(hmac_sha256 "$new_passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase"
+	echo "$(hmac_sha256 "$new_passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase_hmac"
 
 	cut -f1 "$SIGN_CONFIG_DIR/services" | while read -r service_name
 	do

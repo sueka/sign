@@ -20,6 +20,9 @@ EX_PROTOCOL=76
 EX_NOPERM=77
 EX_CONFIG=78
 
+LF='
+'
+
 NAME=$(basename "$0")
 
 SIGN_CONFIG_DIR="$HOME/.sign"
@@ -439,7 +442,7 @@ copy_password() {
 	password_length="$(grep "^$service_name	" "$SIGN_CONFIG_DIR/services" | cut -f2)"
 
 	password=$(
-		hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name $your_id" "$passphrase")" |
+		hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name$LF$your_id" "$passphrase")" |
 		cut -c"-$password_length"
 	)
 	printf %s "$password" | xsel -bi

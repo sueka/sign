@@ -50,6 +50,8 @@ test() {
 	main_test
 	sign_init_test 'sign_init'
 
+	hexadecimal_to_duohexagesimal_test
+
 	rm -r "$PROJECT_ROOT_DIR/test/tmp"
 
 	return $ex
@@ -134,6 +136,20 @@ sign_init_test() {
 	setup_for_each_sign_init_test
 	# passphrase は空白のみでもよい。
 	assert "echo ' $LF ' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+}
+
+#
+# hexadecimal_to_duohexagesimal_test
+#
+hexadecimal_to_duohexagesimal_test() {
+	if ! [ $# -eq 0 ]; then
+		return $EX_USAGE
+	fi
+
+	assert 'hexadecimal_to_duohexagesimal 0' 0 '0'
+	assert 'hexadecimal_to_duohexagesimal F' 0 'F'
+	assert 'hexadecimal_to_duohexagesimal FF' 0 '47'
+	assert 'hexadecimal_to_duohexagesimal FFFFFFFFFFFF' 0 '1HvWXNAa7'
 }
 
 #

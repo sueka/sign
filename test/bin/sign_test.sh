@@ -154,10 +154,10 @@ assert() {
 
 	if [ -n "$*" ]; then
 		expected_stdout=$1 && shift
+	fi
 
-		if [ -n "$*" ]; then
-			expected_stderr=$1 && shift
-		fi
+	if [ -n "$*" ]; then
+		expected_stderr=$1 && shift
 	fi
 
 	# TODO: $command が実行可能であることを確認する

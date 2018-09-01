@@ -49,6 +49,7 @@ test() {
 	sign_init_test 'sign_init'
 
 	hexadecimal_to_duohexagesimal_test
+	hmac_sha256_test
 
 	rm -r "$PROJECT_ROOT_DIR/test/tmp"
 
@@ -141,6 +142,18 @@ hexadecimal_to_duohexagesimal_test() {
 	assert 'hexadecimal_to_duohexagesimal F' 0 'F'
 	assert 'hexadecimal_to_duohexagesimal FF' 0 '47'
 	assert 'hexadecimal_to_duohexagesimal FFFFFFFFFFFF' 0 '1HvWXNAa7'
+}
+
+#
+# hmac_sha256_test
+#
+hmac_sha256_test() {
+	if ! [ $# -eq 0 ]; then
+		return $EX_USAGE
+	fi
+
+	assert 'hmac_sha256 " " " "' 0 '1352c6b2598324a5fb3ad64097ca2d678ddb71d906aa994e2fd0678e0be361aa'
+	assert 'hmac_sha256 message secret' 0 '8b5f48702995c1598c573db1e21866a9b825d4a794d169d7060a03605796360b'
 }
 
 #

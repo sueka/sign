@@ -61,9 +61,7 @@ test() {
 # main_test
 #
 main_test() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 0 ]; then
 		return $EX_USAGE
 	fi
 
@@ -76,9 +74,7 @@ main_test() {
 # setup_for_each_sign_init_test
 #
 setup_for_each_sign_init_test() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 0 ]; then
 		return $EX_USAGE
 	fi
 
@@ -93,18 +89,11 @@ setup_for_each_sign_init_test() {
 # sign_init_test <sign_init_test_command>
 #
 sign_init_test() {
-
-	# オプション無しで呼ばれた場合
-	if [ -z "$*" ]; then
+	if ! [ $# -eq 1 ]; then
 		return $EX_USAGE
 	fi
 
 	sign_init_test_command=$1 && shift
-
-	# 第2オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
-	fi
 
 	setup_for_each_sign_init_test
 	assert "echo 'passphrase${LF}passphrase' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
@@ -156,6 +145,10 @@ hexadecimal_to_duohexagesimal_test() {
 # assert <command> <expected_exit_status> [<expected_stdout> [<expected_stderr>]]
 #
 assert() {
+	if ! ([ 2 -le $# ] && [ $# -le 4 ]); then
+		return $EX_USAGE
+	fi
+
 	command=$1 && shift
 	expected_exit_status=$1 && shift
 
@@ -276,6 +269,10 @@ echo_fatal() {
 # echo_indented <string> <width>
 #
 echo_indented() {
+	if ! [ $# -eq 2 ]; then
+		return $EX_USAGE
+	fi
+
 	string=$1 && shift
 	width=$1 && shift
 

@@ -152,7 +152,7 @@ sign_register() {
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
-		return $EX_IOERR
+		return $EX_SOFTWARE
 	fi
 
 	# オプション無しで呼ばれた場合、サービス名を尋ねる
@@ -225,7 +225,7 @@ sign_get() {
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
-		return $EX_IOERR
+		return $EX_SOFTWARE
 	fi
 
 	# 第1オプション付きで呼ばれた場合
@@ -322,7 +322,7 @@ sign_migrate() {
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
-		return $EX_IOERR
+		return $EX_SOFTWARE
 	fi
 
 	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")

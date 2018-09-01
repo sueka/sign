@@ -52,9 +52,7 @@ check_dependencies() {
 # main migrate
 #
 main() {
-
-	# オプション無しで呼ばれた場合
-	if [ -z "$*" ]; then
+	if ! [ 1 -le $# ]; then
 		return $EX_USAGE
 	fi
 
@@ -89,9 +87,7 @@ main() {
 # sign_init
 #
 sign_init() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 0 ]; then
 		return $EX_USAGE
 	fi
 
@@ -145,6 +141,9 @@ sign_init() {
 # sign_register [<service name> [<your ID>]]
 #
 sign_register() {
+	if ! [ $# -le 2 ]; then
+		return $EX_USAGE
+	fi
 
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
@@ -166,11 +165,6 @@ sign_register() {
 		read -r your_id
 	else
 		your_id=$1 && shift
-	fi
-
-	# 第3オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
 	fi
 
 	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する
@@ -220,6 +214,9 @@ sign_register() {
 # sign_get [<service name> [<your ID>]]
 #
 sign_get() {
+	if ! [ $# -le 2 ]; then
+		return $EX_USAGE
+	fi
 
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
@@ -261,11 +258,6 @@ sign_get() {
 			printf %s "Enter an ID of yours for $service_name: "
 			read -r your_id
 		fi
-	fi
-
-	# 第3オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
 	fi
 
 	given_service_name=$service_name
@@ -319,9 +311,7 @@ sign_get() {
 # sign_migrate
 #
 sign_migrate() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 0 ]; then
 		return $EX_USAGE
 	fi
 
@@ -400,6 +390,10 @@ sign_migrate() {
 # copy_password <service name> <your id> [<passphrase>]
 #
 copy_password() {
+	if ! ([ 2 -le $# ] && [ $# -le 3 ]); then
+		return $EX_USAGE
+	fi
+
 	service_name=$1 && shift
 	your_id=$1 && shift
 
@@ -427,11 +421,6 @@ copy_password() {
 		passphrase=$1 && shift
 	fi
 
-	# 第4オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
-		return $EX_USAGE
-	fi
-
 	password_length="$(grep "^$service_name	" "$SIGN_CONFIG_DIR/services" | cut -f2)"
 
 	password=$(
@@ -445,12 +434,11 @@ copy_password() {
 # hexadecimal_to_duohexagesimal <hex>
 #
 hexadecimal_to_duohexagesimal() {
-	hex=$1 && shift
-
-	# 第2オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 1 ]; then
 		return $EX_USAGE
 	fi
+
+	hex=$1 && shift
 
 	uppercase_hex=$(printf %s "$hex" | LC_COLLATE=C tr a-z A-Z)
 
@@ -486,13 +474,12 @@ bc_with_no_linefeeds() {
 # hmac_sha256 <message> <secret key>
 #
 hmac_sha256() {
-	message=$1 && shift
-	secret_key=$1 && shift
-
-	# 第3オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 2 ]; then
 		return $EX_USAGE
 	fi
+
+	message=$1 && shift
+	secret_key=$1 && shift
 
 	printf %s "$(printf %s "$message" | openssl dgst -sha256 -hmac "$secret_key" | sed 's/^.* //')"
 }
@@ -515,9 +502,7 @@ echo_fatal() {
 # until_enter
 #
 until_enter() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 0 ]; then
 		return $EX_USAGE
 	fi
 

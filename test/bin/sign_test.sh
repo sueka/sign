@@ -201,6 +201,8 @@ assert() {
 		else
 			report_failure "'$command' is expected to print $expected_stdout, but it printed $actual_stdout."
 		fi
+
+		unset expected_stdout
 	fi
 
 	if ${expected_stderr+:} false; then
@@ -209,10 +211,9 @@ assert() {
 		else
 			report_failure "'$command' is expected to print $expected_stderr, but it printed $actual_stderr."
 		fi
-	fi
 
-	unset expected_stdout
-	unset expected_stderr
+		unset expected_stderr
+	fi
 }
 
 

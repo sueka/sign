@@ -155,6 +155,25 @@ sign_register() {
 		return $EX_SOFTWARE
 	fi
 
+	# エコーバックを停止させる
+	old_config=$(stty -g)
+	stty -echo
+
+	printf %s 'Enter your passphrase (invisible): '
+	IFS= read -r passphrase
+	echo
+
+	# エコーバックを再開させる
+	stty "$old_config"
+
+	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
+
+	# passphrase が誤っている場合
+	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+		echo_fatal 'Passphrase is wrong.' >&2
+		return $EX_SOFTWARE
+	fi
+
 	# オプション無しで呼ばれた場合、サービス名を尋ねる
 	if [ -z "$*" ]; then
 		printf %s 'Enter the service name: '
@@ -210,7 +229,7 @@ sign_register() {
 
 	echo "$your_id" >>"$SIGN_CONFIG_DIR/${service_name}_ids"
 
-	copy_password "$service_name" "$your_id"
+	copy_password "$service_name" "$your_id" "$passphrase"
 	echo_info 'Your password is stored in the clipboard.'
 }
 
@@ -225,6 +244,25 @@ sign_get() {
 	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
+		return $EX_SOFTWARE
+	fi
+
+	# エコーバックを停止させる
+	old_config=$(stty -g)
+	stty -echo
+
+	printf %s 'Enter your passphrase (invisible): '
+	IFS= read -r passphrase
+	echo
+
+	# エコーバックを再開させる
+	stty "$old_config"
+
+	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
+
+	# passphrase が誤っている場合
+	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
+		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
 
@@ -303,7 +341,7 @@ sign_get() {
 	printf %s "$your_id" | xsel -bi
 	echo_info 'Your ID is stored in the clipboard.'
 
-	copy_password "$service_name" "$your_id"
+	copy_password "$service_name" "$your_id" "$passphrase"
 	echo_info 'Your password is stored in the clipboard.'
 }
 
@@ -387,39 +425,16 @@ sign_migrate() {
 }
 
 #
-# copy_password <service name> <your id> [<passphrase>]
+# copy_password <service name> <your id> <passphrase>
 #
 copy_password() {
-	if ! ([ 2 -le $# ] && [ $# -le 3 ]); then
+	if ! [ $# -eq 3 ]; then
 		return $EX_USAGE
 	fi
 
 	service_name=$1 && shift
 	your_id=$1 && shift
-
-	# 第3オプション無しで呼ばれた場合、 passphrase を尋ねる
-	if [ -z "$*" ]; then
-		secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
-
-		# エコーバックを停止させる
-		old_config=$(stty -g)
-		stty -echo
-
-		printf %s 'Enter your passphrase (invisible): '
-		IFS= read -r passphrase
-		echo
-
-		# エコーバックを再開させる
-		stty "$old_config"
-
-		# 入力された passphrase が誤っている場合
-		if [ "$(hmac_sha256 "$passphrase" "$secret_key")" != "$(cat "$SIGN_CONFIG_DIR/passphrase")" ]; then
-			echo_fatal 'Passphrase is wrong.' >&2
-			return $EX_SOFTWARE
-		fi
-	else
-		passphrase=$1 && shift
-	fi
+	passphrase=$1 && shift
 
 	password_length="$(grep "^$service_name	" "$SIGN_CONFIG_DIR/services" | cut -f2)"
 

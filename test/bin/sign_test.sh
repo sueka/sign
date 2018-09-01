@@ -33,9 +33,7 @@ NAME=$(basename "$0")
 # test
 #
 test() {
-
-	# オプション付きで呼ばれた場合
-	if [ -n "$*" ]; then
+	if ! [ $# -eq 0 ]; then
 		return $EX_USAGE
 	fi
 

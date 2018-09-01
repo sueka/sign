@@ -193,6 +193,9 @@ assert() {
 			report_failure "'$command' is expected to print $expected_stderr, but it printed $actual_stderr."
 		fi
 	fi
+
+	unset expected_stdout
+	unset expected_stderr
 }
 
 

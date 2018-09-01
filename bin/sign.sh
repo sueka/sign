@@ -97,9 +97,6 @@ sign_init() {
 		return $EX_SOFTWARE
 	fi
 
-	# secret_key を生成する
-	secret_key=$(tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
-
 	# エコーバックを停止させる
 	old_config=$(stty -g)
 	stty -echo
@@ -120,6 +117,9 @@ sign_init() {
 		echo_fatal 'Passphrases do not match.' >&2
 		return $EX_SOFTWARE
 	fi
+
+	# secret_key を生成する
+	secret_key=$(tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
 
 	mkdir -p "$SIGN_CONFIG_DIR"
 	chmod 700 "$SIGN_CONFIG_DIR"
@@ -185,7 +185,7 @@ sign_register() {
 			return $EX_USAGE
 		fi
 
-		if ! [ 1 -le "$password_length" ] || ! [ "$password_length" -le 44 ]; then
+		if ! ([ 1 -le "$password_length" ] && [ "$password_length" -le 44 ]); then
 			echo_fatal 'The password length must be between 1 and 44.'
 			return $EX_USAGE
 		fi

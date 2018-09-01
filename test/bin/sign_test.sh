@@ -123,6 +123,10 @@ sign_init_test() {
 	setup_for_each_sign_init_test
 	# passphrase は空白のみでもよい。
 	assert "echo ' $LF ' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+
+	setup_for_each_sign_init_test
+	# 空白の種類は区別される。
+	assert "echo ' $LF	' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
 }
 
 #

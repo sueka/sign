@@ -2,6 +2,21 @@
 
 set -eu
 
+if ${DEBUG+:} false; then
+	case "$DEBUG" in
+		1 | TRUE | True | true )
+			set -x
+		;;
+
+		'' | 0 | FALSE | False | false )
+		;;
+
+		* )
+			return 64 # $EX_USAGE (not defined)
+		;;
+	esac
+fi
+
 EX_OK=0
 
 EX_USAGE=64

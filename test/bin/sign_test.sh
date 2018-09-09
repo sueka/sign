@@ -2,6 +2,21 @@
 
 set -eu
 
+if ${DEBUG+:} false; then
+	case "$DEBUG" in
+		1 | TRUE | True | true )
+			set -x
+		;;
+
+		'' | 0 | FALSE | False | false )
+		;;
+
+		* )
+			return 64 # $EX_USAGE (not defined)
+		;;
+	esac
+fi
+
 PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
 
 . "$PROJECT_ROOT_DIR/bin/sign.sh"

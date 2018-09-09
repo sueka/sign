@@ -302,7 +302,10 @@ sign_get() {
 			echo 'Choose a service:'
 
 			echo
-			cut -f1 "$SIGN_CONFIG_DIR/services" | sed 's/^/  /'
+			cut -f1 "$SIGN_CONFIG_DIR/services" | while read -r line
+			do
+				echo_indented 2 "$line"
+			done
 			echo
 
 			printf %s 'Enter the service name: '
@@ -331,7 +334,10 @@ sign_get() {
 			echo "Choose your $service_name ID:"
 
 			echo
-			cat "$SIGN_CONFIG_DIR/${service_name}_ids" | sed 's/^/  /'
+			cat "$SIGN_CONFIG_DIR/${service_name}_ids" | while read -r line
+			do
+				echo_indented 2 "$line"
+			done
 			echo
 
 			printf %s "Enter an ID of yours for $service_name: "
@@ -515,6 +521,24 @@ echo_info() {
 #
 echo_fatal() {
 	echo "[FATAL]  $@"
+}
+
+#
+# echo_indented <width> <string>
+#
+echo_indented() {
+	if ! [ $# -eq 2 ]; then
+		return $EX_USAGE
+	fi
+
+	width=$1 && shift
+	string=$1 && shift
+
+	echo "$string" | while IFS= read -r line
+	do
+		printf "%${width}s"
+		echo "$line"
+	done
 }
 
 #

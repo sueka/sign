@@ -17,10 +17,6 @@ if ${DEBUG+:} false; then
 	esac
 fi
 
-PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
-
-. "$PROJECT_ROOT_DIR/bin/sign.sh"
-
 EX_OK=0
 
 EX_USAGE=64
@@ -43,6 +39,10 @@ LF='
 '
 
 NAME=$(basename "$0")
+
+PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
+
+. "$PROJECT_ROOT_DIR/bin/sign.sh"
 
 #
 # test

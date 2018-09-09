@@ -246,7 +246,7 @@ report_pass() {
 	echo "[PASS]    $first_line"
 
 	if [ -n "$subsequent_lines" ]; then
-		echo_indented "$subsequent_lines" 10
+		echo_indented 10 "$subsequent_lines"
 	fi
 }
 
@@ -264,7 +264,7 @@ report_failure() {
 	echo "[FAILURE] $first_line"
 
 	if [ -n "$subsequent_lines" ]; then
-		echo_indented "$subsequent_lines" 10
+		echo_indented 10 "$subsequent_lines"
 	fi
 }
 
@@ -280,7 +280,7 @@ echo_info() {
 	echo "[INFO]    $first_line"
 
 	if [ -n "$subsequent_lines" ]; then
-		echo_indented "$subsequent_lines" 10
+		echo_indented 10 "$subsequent_lines"
 	fi
 }
 
@@ -296,20 +296,20 @@ echo_fatal() {
 	echo "[FATAL]   $first_line"
 
 	if [ -n "$subsequent_lines" ]; then
-		echo_indented "$subsequent_lines" 10
+		echo_indented 10 "$subsequent_lines"
 	fi
 }
 
 #
-# echo_indented <string> <width>
+# echo_indented <width> <string>
 #
 echo_indented() {
 	if ! [ $# -eq 2 ]; then
 		return $EX_USAGE
 	fi
 
-	string=$1 && shift
 	width=$1 && shift
+	string=$1 && shift
 
 	echo "$string" | while IFS= read -r line
 	do

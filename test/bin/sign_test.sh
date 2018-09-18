@@ -62,10 +62,10 @@ test() {
 
 	mkdir -p "$PROJECT_ROOT_DIR/test/tmp/dev"
 
-	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/dummy-stty/bin"':$PATH'
+	PATH_IGNORING_STTY="$PROJECT_ROOT_DIR/test/dummy-stty/bin:$PATH"
 
 	main_test
-	sign_init_test 'sign_init'
+	PATH="$PATH_IGNORING_STTY" sign_init_test 'sign_init'
 
 	hexadecimal_to_duohexagesimal_test
 	hmac_sha256_test
@@ -86,7 +86,7 @@ main_test() {
 
 	assert 'main' $EX_USAGE
 
-	sign_init_test 'main init'
+	PATH="$PATH_IGNORING_STTY" sign_init_test 'main init'
 }
 
 #
@@ -115,23 +115,23 @@ sign_init_test() {
 	sign_init_test_command=$1 && shift
 
 	setup_for_each_sign_init_test
-	assert "echo 'passphrase${LF}passphrase' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+	assert "echo 'passphrase${LF}passphrase' | $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
-	assert "echo '#${LF}#' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+	assert "echo '#${LF}#' | $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
-	assert "echo 'elif${LF}elif' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+	assert "echo 'elif${LF}elif' | $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
-	assert "echo '.${LF}.' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+	assert "echo '.${LF}.' | $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
-	assert "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+	assert "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
 	# passphrase と passphrase_again は完全に一致しなければならない。
-	assert "echo 'passphrase${LF}passphrase ' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
+	assert "echo 'passphrase${LF}passphrase ' | $sign_init_test_command" $EX_SOFTWARE
 
 	setup_for_each_sign_init_test
 	# sign_init はオプションを受け付けない。
@@ -139,17 +139,17 @@ sign_init_test() {
 
 	setup_for_each_sign_init_test
 	# passphrase は空文字列であってもよい。
-	assert "echo '' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+	assert "echo '' | $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
 	# passphrase は空白のみでもよい。
-	assert "echo ' $LF ' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_OK
+	assert "echo ' $LF ' | $sign_init_test_command" $EX_OK
 
 	setup_for_each_sign_init_test
 	# 空白の種類は区別される。
-	assert "echo ' $LF	' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
-	assert "echo '	$LF　' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
-	assert "echo '　$LF ' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
+	assert "echo ' $LF	' | $sign_init_test_command" $EX_SOFTWARE
+	assert "echo '	$LF　' | $sign_init_test_command" $EX_SOFTWARE
+	assert "echo '　$LF ' | $sign_init_test_command" $EX_SOFTWARE
 }
 
 #

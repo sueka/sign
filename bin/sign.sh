@@ -17,8 +17,10 @@ if ${DEBUG+:} false; then
 	esac
 fi
 
-EX_OK=0
+LF='
+'
 
+EX_OK=0
 EX_USAGE=64
 EX_DATAERR=65
 EX_NOINPUT=66
@@ -35,12 +37,9 @@ EX_PROTOCOL=76
 EX_NOPERM=77
 EX_CONFIG=78
 
-LF='
-'
+SIGN_CONFIG_DIR="$HOME/.sign"
 
 NAME=$(basename "$0")
-
-SIGN_CONFIG_DIR="$HOME/.sign"
 
 #
 # check_dependencies

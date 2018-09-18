@@ -17,8 +17,10 @@ if ${DEBUG+:} false; then
 	esac
 fi
 
-EX_OK=0
+LF='
+'
 
+EX_OK=0
 EX_USAGE=64
 EX_DATAERR=65
 EX_NOINPUT=66
@@ -35,12 +37,10 @@ EX_PROTOCOL=76
 EX_NOPERM=77
 EX_CONFIG=78
 
-LF='
-'
+PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
 
 NAME=$(basename "$0")
 
-PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
 
 . "$PROJECT_ROOT_DIR/bin/sign.sh"
 

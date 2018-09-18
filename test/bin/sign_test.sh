@@ -251,8 +251,6 @@ assert() {
 	fi
 }
 
-
-
 #
 # report_pass [<string> ..]
 #

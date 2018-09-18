@@ -41,8 +41,12 @@ PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
 
 NAME=$(basename "$0")
 
-
-. "$PROJECT_ROOT_DIR/bin/sign.sh"
+#
+# ensure_dependencies
+#
+ensure_dependencies() {
+	. "$PROJECT_ROOT_DIR/bin/sign.sh"
+}
 
 #
 # test
@@ -336,10 +340,12 @@ echo_indented() {
 # entry
 case "$NAME" in
 	sign_test.sh )
+		ensure_dependencies
 		test "$@"
 	;;
 
 	sign_test_test.sh )
+		ensure_dependencies
 	;;
 
 	* )

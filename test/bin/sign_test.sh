@@ -148,6 +148,8 @@ sign_init_test() {
 	setup_for_each_sign_init_test
 	# 空白の種類は区別される。
 	assert "echo ' $LF	' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
+	assert "echo '	$LF　' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
+	assert "echo '　$LF ' | PATH="$PATH_IGNORING_STTY" $sign_init_test_command" $EX_SOFTWARE
 }
 
 #

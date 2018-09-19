@@ -90,9 +90,9 @@ main_test() {
 }
 
 #
-# setup_for_each_sign_init_test
+# setup_for_sign_init
 #
-setup_for_each_sign_init_test() {
+setup_for_sign_init() {
 	if ! [ $# -eq 0 ]; then
 		return $EX_USAGE
 	fi
@@ -105,51 +105,51 @@ setup_for_each_sign_init_test() {
 }
 
 #
-# sign_init_test <sign_init_test_command>
+# sign_init_test <sign_init_command>
 #
 sign_init_test() {
 	if ! [ $# -eq 1 ]; then
 		return $EX_USAGE
 	fi
 
-	sign_init_test_command=$1 && shift
+	sign_init_command=$1 && shift
 
-	setup_for_each_sign_init_test
-	assert "echo 'passphrase${LF}passphrase' | $sign_init_test_command" $EX_OK
+	setup_for_sign_init
+	assert "echo 'passphrase${LF}passphrase' | $sign_init_command" $EX_OK
 
-	setup_for_each_sign_init_test
-	assert "echo '#${LF}#' | $sign_init_test_command" $EX_OK
+	setup_for_sign_init
+	assert "echo '#${LF}#' | $sign_init_command" $EX_OK
 
-	setup_for_each_sign_init_test
-	assert "echo 'elif${LF}elif' | $sign_init_test_command" $EX_OK
+	setup_for_sign_init
+	assert "echo 'elif${LF}elif' | $sign_init_command" $EX_OK
 
-	setup_for_each_sign_init_test
-	assert "echo '.${LF}.' | $sign_init_test_command" $EX_OK
+	setup_for_sign_init
+	assert "echo '.${LF}.' | $sign_init_command" $EX_OK
 
-	setup_for_each_sign_init_test
-	assert "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | $sign_init_test_command" $EX_OK
+	setup_for_sign_init
+	assert "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | $sign_init_command" $EX_OK
 
-	setup_for_each_sign_init_test
+	setup_for_sign_init
 	# passphrase と passphrase_again は完全に一致しなければならない。
-	assert "echo 'passphrase${LF}passphrase ' | $sign_init_test_command" $EX_SOFTWARE
+	assert "echo 'passphrase${LF}passphrase ' | $sign_init_command" $EX_SOFTWARE
 
-	setup_for_each_sign_init_test
+	setup_for_sign_init
 	# sign_init はオプションを受け付けない。
-	assert "$sign_init_test_command :" $EX_USAGE
+	assert "$sign_init_command :" $EX_USAGE
 
-	setup_for_each_sign_init_test
+	setup_for_sign_init
 	# passphrase は空文字列であってもよい。
-	assert "echo '' | $sign_init_test_command" $EX_OK
+	assert "echo '' | $sign_init_command" $EX_OK
 
-	setup_for_each_sign_init_test
+	setup_for_sign_init
 	# passphrase は空白のみでもよい。
-	assert "echo ' $LF ' | $sign_init_test_command" $EX_OK
+	assert "echo ' $LF ' | $sign_init_command" $EX_OK
 
-	setup_for_each_sign_init_test
+	setup_for_sign_init
 	# 空白の種類は区別される。
-	assert "echo ' $LF	' | $sign_init_test_command" $EX_SOFTWARE
-	assert "echo '	$LF　' | $sign_init_test_command" $EX_SOFTWARE
-	assert "echo '　$LF ' | $sign_init_test_command" $EX_SOFTWARE
+	assert "echo ' $LF	' | $sign_init_command" $EX_SOFTWARE
+	assert "echo '	$LF　' | $sign_init_command" $EX_SOFTWARE
+	assert "echo '　$LF ' | $sign_init_command" $EX_SOFTWARE
 }
 
 #

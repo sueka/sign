@@ -42,6 +42,21 @@ PROJECT_ROOT_DIR=$(cd "$(dirname "$0")/../.."; pwd)
 NAME=$(basename "$0")
 
 #
+# check_dependencies
+#
+check_dependencies() {
+	ex=$EX_OK
+
+	# xsel が無い場合
+	if ! command -v xsel 1>/dev/null; then
+		echo_fatal "No command 'xsel' found." >&2
+		ex=$EX_UNAVAILABLE
+	fi
+
+	return $ex
+}
+
+#
 # ensure_dependencies
 #
 ensure_dependencies() {
@@ -66,11 +81,7 @@ test() {
 
 	main_test
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'sign_init'
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' passphrase
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' '#'
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' elif
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' .
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register'
 
 	hexadecimal_to_duohexagesimal_test
 	hmac_sha256_test
@@ -92,11 +103,7 @@ main_test() {
 	assert -x $EX_USAGE 'main'
 
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'main init'
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' passphrase
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' '#'
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' elif
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' .
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register'
 }
 
 #
@@ -177,23 +184,22 @@ setup_for_sign_register() {
 }
 
 #
-# sign_register_test <sign_register_command> <passphrase>
+# sign_register_test <sign_register_command>
 #
 sign_register_test() {
-	if ! [ $# -eq 2 ]; then
+	if ! [ $# -eq 1 ]; then
 		return $EX_USAGE
 	fi
 
 	sign_register_command=$1 && shift
-	passphrase=$1 && shift
 
-	setup_for_sign_register "$passphrase"
-	assert -x $EX_OK "echo '$passphrase${LF}' | $sign_register_command GitHub sueka"
-	assert -x $EX_OK "echo '$passphrase${LF}hsueka${LF}' | $sign_register_command Twitter"
-	assert -x $EX_OK "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_register_command"
+	setup_for_sign_register 'bad passphrase'
+	assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_register_command GitHub sueka"
+	assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_register_command Twitter"
+	assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_register_command"
 
 	# すでにパスワードが発行されたことがあるサービスのパスワード長は尋ねられない。
-	assert -x $EX_OK "echo '$passphrase${LF}pipibaoni' | $sign_register_command Twitter"
+	assert -x $EX_OK -b'J3kUxlp26HhPdLIQABxnQyAv45P5f4DvoRCtRtoH0yy' "echo '$passphrase${LF}pipibaoni' | $sign_register_command Twitter"
 
 	# すでにパスワードが発行されてゐる ID のパスワードは発行できない。
 	assert -x $EX_SOFTWARE "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_register_command"
@@ -241,10 +247,10 @@ bc_with_no_linefeeds_test() {
 }
 
 #
-# assert [-x <expected_exit_status>] [-o <expected_stdout>] [-e <expected_stderr>] <command>
+# assert [-x <expected_exit_status>] [-o <expected_stdout>] [-e <expected_stderr>] [-b <expected_clipboard_selection>] <command>
 #
 assert() {
-	while getopts x:o:e: OPT
+	while getopts x:o:e:b: OPT
 	do
 		case "$OPT" in
 			x )
@@ -257,6 +263,10 @@ assert() {
 
 			e )
 				expected_stderr=$OPTARG
+			;;
+
+			b )
+				expected_clipboard_selection=$OPTARG
 			;;
 		esac
 	done
@@ -283,6 +293,8 @@ assert() {
 	actual_stdout=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stdout")
 	actual_stderr=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stderr")
 
+	actual_clipboard_selection=$(xsel -bo)
+
 	if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
 		report_pass "'$command' exited with $actual_exit_status as expected."
 	else
@@ -307,6 +319,16 @@ assert() {
 		fi
 
 		unset expected_stderr
+	fi
+
+	if ${expected_clipboard_selection+:} false; then
+		if [ "$actual_clipboard_selection" = "$expected_clipboard_selection" ]; then
+			report_pass "'$command' stored $actual_clipboard_selection into the clipboard as expected."
+		else
+			report_failure "'$command' is expected to store $expected_clipboard_selection into the clipboard, but it stored $actual_clipboard_selection."
+		fi
+
+		unset expected_clipboard_selection
 	fi
 }
 
@@ -397,11 +419,13 @@ echo_indented() {
 # entry
 case "$NAME" in
 	sign_test.sh )
+		check_dependencies
 		ensure_dependencies
 		test "$@"
 	;;
 
 	sign_test_test.sh )
+		check_dependencies
 		ensure_dependencies
 	;;
 

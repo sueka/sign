@@ -163,7 +163,7 @@ sign_init_test() {
 }
 
 #
-# setup_for_sign_register <passphrase
+# setup_for_sign_register <passphrase>
 #
 setup_for_sign_register() {
 	if ! [ $# -eq 1 ]; then

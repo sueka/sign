@@ -66,6 +66,11 @@ test() {
 
 	main_test
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'sign_init'
+	sign_register_test 'sign_register' passphrase
+	sign_register_test 'sign_register' '#'
+	sign_register_test 'sign_register' elif
+	sign_register_test 'sign_register' .
+	sign_register_test 'sign_register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
 
 	hexadecimal_to_duohexagesimal_test
 	hmac_sha256_test
@@ -87,6 +92,11 @@ main_test() {
 	assert 'main' $EX_USAGE
 
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'main init'
+	sign_register_test 'main register' passphrase
+	sign_register_test 'main register' '#'
+	sign_register_test 'main register' elif
+	sign_register_test 'main register' .
+	sign_register_test 'main register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
 }
 
 #
@@ -150,6 +160,43 @@ sign_init_test() {
 	assert "echo ' $LF	' | $sign_init_command" $EX_SOFTWARE
 	assert "echo '	$LF　' | $sign_init_command" $EX_SOFTWARE
 	assert "echo '　$LF ' | $sign_init_command" $EX_SOFTWARE
+}
+
+#
+# setup_for_sign_register <passphrase
+#
+setup_for_sign_register() {
+	if ! [ $# -eq 1 ]; then
+		return $EX_USAGE
+	fi
+
+	passphrase=$1 && shift
+
+	setup_for_sign_init
+	echo "$passphrase$LF$passphrase" | $sign_init_command >/dev/null
+}
+
+#
+# sign_register_test <sign_register_command> <passphrase>
+#
+sign_register_test() {
+	if ! [ $# -eq 2 ]; then
+		return $EX_USAGE
+	fi
+
+	sign_register_command=$1 && shift
+	passphrase=$1 && shift
+
+	setup_for_sign_register "$passphrase"
+	assert "echo '$passphrase${LF}' | $sign_register_command GitHub sueka" $EX_OK
+	assert "echo '$passphrase${LF}hsueka${LF}' | $sign_register_command Twitter" $EX_OK
+	assert "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_register_command" $EX_OK
+
+	# すでにパスワードが発行されたことがあるサービスのパスワード長は尋ねられない。
+	assert "echo '$passphrase${LF}pipibaoni' | $sign_register_command Twitter" $EX_OK
+
+	# すでにパスワードが発行されてゐる ID のパスワードは発行できない。
+	assert "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_register_command" $EX_SOFTWARE
 }
 
 #

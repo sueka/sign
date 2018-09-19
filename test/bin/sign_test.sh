@@ -173,7 +173,7 @@ setup_for_sign_register() {
 	passphrase=$1 && shift
 
 	setup_for_sign_init
-	echo "$passphrase$LF$passphrase" | $sign_init_command >/dev/null
+	echo "$passphrase$LF$passphrase" | sign_init >/dev/null
 }
 
 #

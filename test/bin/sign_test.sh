@@ -66,11 +66,11 @@ test() {
 
 	main_test
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'sign_init'
-	sign_register_test 'sign_register' passphrase
-	sign_register_test 'sign_register' '#'
-	sign_register_test 'sign_register' elif
-	sign_register_test 'sign_register' .
-	sign_register_test 'sign_register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' passphrase
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' '#'
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' elif
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' .
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
 
 	hexadecimal_to_duohexagesimal_test
 	hmac_sha256_test
@@ -92,11 +92,11 @@ main_test() {
 	assert 'main' $EX_USAGE
 
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'main init'
-	sign_register_test 'main register' passphrase
-	sign_register_test 'main register' '#'
-	sign_register_test 'main register' elif
-	sign_register_test 'main register' .
-	sign_register_test 'main register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' passphrase
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' '#'
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' elif
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' .
+	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register' 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.'
 }
 
 #

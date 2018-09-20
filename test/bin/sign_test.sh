@@ -297,10 +297,12 @@ assert() {
 
 	actual_clipboard_selection=$(xsel -bo)
 
-	if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
-		report_pass "'$command' exited with $actual_exit_status as expected."
-	else
-		report_failure "'$command' is expected to exit with $expected_exit_status, but it exited with $actual_exit_status."
+	if ${expected_exit_status+:} false; then
+		if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
+			report_pass "'$command' exited with $actual_exit_status as expected."
+		else
+			report_failure "'$command' is expected to exit with $expected_exit_status, but it exited with $actual_exit_status."
+		fi
 	fi
 
 	if ${expected_stdout+:} false; then

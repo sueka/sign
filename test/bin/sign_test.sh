@@ -100,7 +100,7 @@ main_test() {
 		return $EX_USAGE
 	fi
 
-	assert -x $EX_USAGE 'main'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE 'main'
 
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'main init'
 	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register'
@@ -132,41 +132,41 @@ sign_init_test() {
 	sign_init_command=$1 && shift
 
 	setup_for_sign_init
-	assert -x $EX_OK "echo 'passphrase${LF}passphrase' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo 'passphrase${LF}passphrase' | $sign_init_command"
 
 	setup_for_sign_init
-	assert -x $EX_OK "echo '#${LF}#' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo '#${LF}#' | $sign_init_command"
 
 	setup_for_sign_init
-	assert -x $EX_OK "echo 'elif${LF}elif' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo 'elif${LF}elif' | $sign_init_command"
 
 	setup_for_sign_init
-	assert -x $EX_OK "echo '.${LF}.' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo '.${LF}.' | $sign_init_command"
 
 	setup_for_sign_init
-	assert -x $EX_OK "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | $sign_init_command"
 
 	setup_for_sign_init
 	# passphrase と passphrase_again は完全に一致しなければならない。
-	assert -x $EX_SOFTWARE "echo 'passphrase${LF}passphrase ' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo 'passphrase${LF}passphrase ' | $sign_init_command"
 
 	setup_for_sign_init
 	# sign_init はオプションを受け付けない。
-	assert -x $EX_USAGE "$sign_init_command :"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "$sign_init_command :"
 
 	setup_for_sign_init
 	# passphrase は空文字列であってもよい。
-	assert -x $EX_OK "echo '' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo '' | $sign_init_command"
 
 	setup_for_sign_init
 	# passphrase は空白のみでもよい。
-	assert -x $EX_OK "echo ' $LF ' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo ' $LF ' | $sign_init_command"
 
 	setup_for_sign_init
 	# 空白の種類は区別される。
-	assert -x $EX_SOFTWARE "echo ' $LF	' | $sign_init_command"
-	assert -x $EX_SOFTWARE "echo '	$LF　' | $sign_init_command"
-	assert -x $EX_SOFTWARE "echo '　$LF ' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo ' $LF	' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '	$LF　' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '　$LF ' | $sign_init_command"
 }
 
 #
@@ -194,15 +194,15 @@ sign_register_test() {
 	sign_register_command=$1 && shift
 
 	setup_for_sign_register 'bad passphrase'
-	assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_register_command GitHub sueka"
-	assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_register_command Twitter"
-	assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_register_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_register_command GitHub sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_register_command Twitter"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_register_command"
 
 	# すでにパスワードが発行されたことがあるサービスのパスワード長は尋ねられない。
-	assert -x $EX_OK -b'J3kUxlp26HhPdLIQABxnQyAv45P5f4DvoRCtRtoH0yy' "echo '$passphrase${LF}pipibaoni' | $sign_register_command Twitter"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'J3kUxlp26HhPdLIQABxnQyAv45P5f4DvoRCtRtoH0yy' "echo '$passphrase${LF}pipibaoni' | $sign_register_command Twitter"
 
 	# すでにパスワードが発行されてゐる ID のパスワードは発行できない。
-	assert -x $EX_SOFTWARE "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_register_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_register_command"
 }
 
 #
@@ -213,10 +213,10 @@ hexadecimal_to_duohexagesimal_test() {
 		return $EX_USAGE
 	fi
 
-	assert -x $EX_OK -o'0' 'hexadecimal_to_duohexagesimal 0'
-	assert -x $EX_OK -o'F' 'hexadecimal_to_duohexagesimal F'
-	assert -x $EX_OK -o'47' 'hexadecimal_to_duohexagesimal FF'
-	assert -x $EX_OK -o'1HvWXNAa7' 'hexadecimal_to_duohexagesimal FFFFFFFFFFFF'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o'0' 'hexadecimal_to_duohexagesimal 0'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o'F' 'hexadecimal_to_duohexagesimal F'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o'47' 'hexadecimal_to_duohexagesimal FF'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o'1HvWXNAa7' 'hexadecimal_to_duohexagesimal FFFFFFFFFFFF'
 }
 
 #
@@ -227,8 +227,8 @@ hmac_sha256_test() {
 		return $EX_USAGE
 	fi
 
-	assert -x $EX_OK -o'1352c6b2598324a5fb3ad64097ca2d678ddb71d906aa994e2fd0678e0be361aa' 'hmac_sha256 " " " "'
-	assert -x $EX_OK -o'8b5f48702995c1598c573db1e21866a9b825d4a794d169d7060a03605796360b' 'hmac_sha256 message secret'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o'1352c6b2598324a5fb3ad64097ca2d678ddb71d906aa994e2fd0678e0be361aa' 'hmac_sha256 " " " "'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o'8b5f48702995c1598c573db1e21866a9b825d4a794d169d7060a03605796360b' 'hmac_sha256 message secret'
 }
 
 #
@@ -239,11 +239,11 @@ bc_with_no_linefeeds_test() {
 		return $EX_USAGE
 	fi
 
-	assert -x $EX_OK -o'281474976710655' 'echo "ibase=16; FFFFFFFFFFFF" | bc_with_no_linefeeds'
-	assert -x $EX_OK -o' 01 17 57 32 33 23 10 36 07' 'echo "obase=62; 281474976710655" | bc_with_no_linefeeds'
-	assert -x $EX_OK -o' 04 32 01 09 77 41 88 03' 'echo "obase=94; 281474976710655" | bc_with_no_linefeeds'
-	assert -x $EX_OK -o' 281 474 976 710 655' 'echo "obase=1000; 281474976710655" | bc_with_no_linefeeds'
-	assert -x $EX_OK -o' 02 01 01 17 11 32 48 01 31 17 36 40 32 55 58 20 38 51 46 25 22 47 58 50 37' 'echo "obase=62; 20988936657440586486151264256610222593863921" | bc_with_no_linefeeds'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o'281474976710655' 'echo "ibase=16; FFFFFFFFFFFF" | bc_with_no_linefeeds'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o' 01 17 57 32 33 23 10 36 07' 'echo "obase=62; 281474976710655" | bc_with_no_linefeeds'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o' 04 32 01 09 77 41 88 03' 'echo "obase=94; 281474976710655" | bc_with_no_linefeeds'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o' 281 474 976 710 655' 'echo "obase=1000; 281474976710655" | bc_with_no_linefeeds'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -o' 02 01 01 17 11 32 48 01 31 17 36 40 32 55 58 20 38 51 46 25 22 47 58 50 37' 'echo "obase=62; 20988936657440586486151264256610222593863921" | bc_with_no_linefeeds'
 }
 
 #
@@ -293,7 +293,7 @@ assert() {
 	actual_stdout=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stdout")
 	actual_stderr=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stderr")
 
-	actual_clipboard_selection=$(PATH="$PATH_IGNORING_STTY" xsel -bo)
+	actual_clipboard_selection=$(xsel -bo)
 
 	if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
 		report_pass "'$command' exited with $actual_exit_status as expected."

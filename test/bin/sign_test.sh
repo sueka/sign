@@ -47,7 +47,6 @@ NAME=$(basename "$0")
 check_dependencies() {
 	ex=$EX_OK
 
-	# xsel が無い場合
 	if ! command -v xsel 1>/dev/null; then
 		echo_fatal "No command 'xsel' found." >&2
 		ex=$EX_UNAVAILABLE
@@ -281,7 +280,7 @@ assert() {
 
 	command=$1 && shift
 
-	# TODO: $command が実行可能であることを確認する
+	# TODO: $command が実行可能であることを確認する。
 
 	set_current=$(set +o)
 	set +e

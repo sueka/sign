@@ -47,13 +47,11 @@ NAME=$(basename "$0")
 check_dependencies() {
 	ex=$EX_OK
 
-	# openssl が無い場合
 	if ! command -v openssl 1>/dev/null; then
 		echo_fatal "No command 'openssl' found." >&2
 		ex=$EX_UNAVAILABLE
 	fi
 
-	# xsel が無い場合
 	if ! command -v xsel 1>/dev/null; then
 		echo_fatal "No command 'xsel' found." >&2
 		ex=$EX_UNAVAILABLE
@@ -92,7 +90,6 @@ main() {
 			sign_migrate "$@"
 		;;
 
-		# サブコマンドが存在しない場合
 		* )
 			echo_fatal "No subcommand '$subcommand' found." >&2
 			return $EX_USAGE
@@ -108,7 +105,6 @@ sign_init() {
 		return $EX_USAGE
 	fi
 
-	# $SIGN_CONFIG_DIR が存在する場合
 	if [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal "'$SIGN_CONFIG_DIR' does already exist." >&2
 		return $EX_SOFTWARE
@@ -129,7 +125,6 @@ sign_init() {
 	# エコーバックを再開させる
 	stty "$old_config"
 
-	# passphrase と passphrase_again が異なる場合
 	if [ "$passphrase" != "$passphrase_again" ]; then
 		echo_fatal 'Passphrases do not match.' >&2
 		return $EX_SOFTWARE
@@ -166,7 +161,6 @@ sign_register() {
 		return $EX_USAGE
 	fi
 
-	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
 		return $EX_SOFTWARE
@@ -191,7 +185,7 @@ sign_register() {
 		return $EX_SOFTWARE
 	fi
 
-	# オプション無しで呼ばれた場合、サービス名を尋ねる
+	# 第1オプション無しで呼ばれた場合、サービス名を尋ねる
 	if [ -z "$*" ]; then
 		printf %s 'Enter the service name: '
 		read -r service_name
@@ -258,7 +252,6 @@ sign_get() {
 		return $EX_USAGE
 	fi
 
-	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
 		return $EX_SOFTWARE
@@ -283,14 +276,14 @@ sign_get() {
 		return $EX_SOFTWARE
 	fi
 
-	# 第1オプション無しで呼ばれた場合
+	# 第1オプション無しで呼ばれた場合、サービス名の設定を後回しにする
 	if [ -z "$*" ]; then
 		service_name=
 	else
 		service_name=$1 && shift
 	fi
 
-	# 第2オプション無しで呼ばれた場合
+	# 第2オプション無しで呼ばれた場合、 ID の設定を後回しにする
 	if [ -z "$*" ]; then
 		your_id=
 	else
@@ -331,7 +324,7 @@ sign_get() {
 
 	your_given_id=$your_id
 
-	# ID が存在しない場合
+	# 指定された ID が存在しない場合
 	while ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null
 	do
 		if command -v peco 1>/dev/null; then
@@ -377,7 +370,6 @@ sign_migrate() {
 		return $EX_USAGE
 	fi
 
-	# $SIGN_CONFIG_DIR が存在しない場合
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
 		return $EX_SOFTWARE
@@ -417,7 +409,6 @@ sign_migrate() {
 	# エコーバックを再開させる
 	stty "$old_config"
 
-	# new_passphrase と new_passphrase_again が異なる場合
 	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
 		echo_fatal 'New passphrases do not match.' >&2
 		return $EX_SOFTWARE

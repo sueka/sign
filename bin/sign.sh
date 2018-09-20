@@ -518,14 +518,32 @@ hmac_sha256() {
 # echo_info [<string> ..]
 #
 echo_info() {
-	echo "[INFO]   $@"
+	string="$@"
+
+	first_line=$(echo "$string" | head -n1)
+	subsequent_lines=$(echo "$string" | tail -n+2)
+
+	echo "[INFO]    $first_line"
+
+	if [ -n "$subsequent_lines" ]; then
+		echo_indented 10 "$subsequent_lines"
+	fi
 }
 
 #
 # echo_fatal [<string> ..]
 #
 echo_fatal() {
-	echo "[FATAL]  $@"
+	string="$@"
+
+	first_line=$(echo "$string" | head -n1)
+	subsequent_lines=$(echo "$string" | tail -n+2)
+
+	echo "[FATAL]   $first_line"
+
+	if [ -n "$subsequent_lines" ]; then
+		echo_indented 10 "$subsequent_lines"
+	fi
 }
 
 #

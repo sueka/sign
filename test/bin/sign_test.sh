@@ -250,7 +250,7 @@ bc_with_no_linefeeds_test() {
 # assert [-x <expected_exit_status>] [-o <expected_stdout>] [-e <expected_stderr>] [-b <expected_clipboard_selection>] <command>
 #
 assert() {
-	unset expected_stdout expected_stderr expected_clipboard_selection
+	unset expected_exit_status expected_stdout expected_stderr expected_clipboard_selection
 
 	while getopts x:o:e:b: OPT
 	do

@@ -250,6 +250,8 @@ bc_with_no_linefeeds_test() {
 # assert [-x <expected_exit_status>] [-o <expected_stdout>] [-e <expected_stderr>] [-b <expected_clipboard_selection>] <command>
 #
 assert() {
+	unset expected_stdout expected_stderr expected_clipboard_selection
+
 	while getopts x:o:e:b: OPT
 	do
 		case "$OPT" in
@@ -307,8 +309,6 @@ assert() {
 		else
 			report_failure "'$command' is expected to print $expected_stdout, but it printed $actual_stdout."
 		fi
-
-		unset expected_stdout
 	fi
 
 	if ${expected_stderr+:} false; then
@@ -317,8 +317,6 @@ assert() {
 		else
 			report_failure "'$command' is expected to print $expected_stderr, but it printed $actual_stderr."
 		fi
-
-		unset expected_stderr
 	fi
 
 	if ${expected_clipboard_selection+:} false; then
@@ -327,8 +325,6 @@ assert() {
 		else
 			report_failure "'$command' is expected to store $expected_clipboard_selection into the clipboard, but it stored $actual_clipboard_selection."
 		fi
-
-		unset expected_clipboard_selection
 	fi
 }
 

@@ -61,10 +61,10 @@ check_dependencies() {
 }
 
 #
-# main init
-# main register [<service name> [<your ID>]]
-# main get [<service name> [<your ID>]]
-# main migrate
+# main init [<operand> ..]
+# main register [<operand> ..]
+# main get [<operand> ..]
+# main migrate [<operand> ..]
 #
 main() {
 	if ! [ 1 -le $# ]; then

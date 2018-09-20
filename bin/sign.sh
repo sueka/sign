@@ -157,6 +157,8 @@ sign_init() {
 # sign_register [<service name> [<your ID>]]
 #
 sign_register() {
+	unset service_name your_id
+
 	if ! [ $# -le 2 ]; then
 		return $EX_USAGE
 	fi
@@ -248,6 +250,8 @@ sign_register() {
 # sign_get [<service name> [<your ID>]]
 #
 sign_get() {
+	unset service_name your_id
+
 	if ! [ $# -le 2 ]; then
 		return $EX_USAGE
 	fi

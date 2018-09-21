@@ -130,16 +130,13 @@ sign_init() {
 		return $EX_SOFTWARE
 	fi
 
-	# secret_key を生成する
-	secret_key=$(tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
+	# salt を生成する
+	salt=$(tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
 
 	# TODO: BEGIN TRANSACTION
 
 	mkdir -p "$SIGN_CONFIG_DIR"
 	chmod 700 "$SIGN_CONFIG_DIR"
-
-	touch "$SIGN_CONFIG_DIR/secret_key"
-	chmod 600 "$SIGN_CONFIG_DIR/secret_key"
 
 	touch "$SIGN_CONFIG_DIR/passphrase_hmac"
 	chmod 600 "$SIGN_CONFIG_DIR/passphrase_hmac"
@@ -147,8 +144,7 @@ sign_init() {
 	touch "$SIGN_CONFIG_DIR/services"
 	chmod 604 "$SIGN_CONFIG_DIR/services"
 
-	echo "$secret_key" >"$SIGN_CONFIG_DIR/secret_key"
-	echo "$(hmac_sha256 "$passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase_hmac"
+	echo "$salt	$(hmac_sha256 "$salt" "$passphrase")" >"$SIGN_CONFIG_DIR/passphrase_hmac"
 
 	# TODO: COMMIT
 }
@@ -179,10 +175,11 @@ sign_register() {
 	# エコーバックを再開させる
 	stty "$old_config"
 
-	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
+	salt=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f1)
+	passphrase_hmac=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f2)
 
 	# passphrase が誤っている場合
-	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase_hmac")" ]; then
+	if [ $(hmac_sha256 "$salt" "$passphrase") != "$passphrase_hmac" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
@@ -272,10 +269,11 @@ sign_get() {
 	# エコーバックを再開させる
 	stty "$old_config"
 
-	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
+	salt=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f1)
+	passphrase_hmac=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f2)
 
 	# passphrase が誤っている場合
-	if [ $(hmac_sha256 "$passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase_hmac")" ]; then
+	if [ $(hmac_sha256 "$salt" "$passphrase") != "$passphrase_hmac" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
@@ -379,7 +377,8 @@ sign_migrate() {
 		return $EX_SOFTWARE
 	fi
 
-	secret_key=$(cat "$SIGN_CONFIG_DIR/secret_key")
+	salt=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f1)
+	old_passphrase_hmac=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f2)
 
 	# エコーバックを停止させる
 	old_config=$(stty -g)
@@ -393,7 +392,7 @@ sign_migrate() {
 	stty "$old_config"
 
 	# old_passphrase が誤っている場合
-	if [ $(hmac_sha256 "$old_passphrase" "$secret_key") != "$(cat "$SIGN_CONFIG_DIR/passphrase_hmac")" ]; then
+	if [ $(hmac_sha256 "$salt" "$old_passphrase") != "$old_passphrase_hmac" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_SOFTWARE
 	fi
@@ -418,7 +417,7 @@ sign_migrate() {
 		return $EX_SOFTWARE
 	fi
 
-	echo "$(hmac_sha256 "$new_passphrase" "$secret_key")" >"$SIGN_CONFIG_DIR/passphrase_hmac"
+	echo "$salt	$(hmac_sha256 "$salt" "$new_passphrase")" >"$SIGN_CONFIG_DIR/passphrase_hmac"
 
 	cut -f1 "$SIGN_CONFIG_DIR/services" | while read -r service_name
 	do

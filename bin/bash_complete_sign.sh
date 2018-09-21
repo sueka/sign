@@ -53,7 +53,7 @@ _complete_sign() {
 
 			'init' | 'migrate' )
 				if [ -n "$cur" ]; then
-					return $EX_OK
+					return $EX_USAGE
 				fi
 
 				return $EX_OK
@@ -68,7 +68,7 @@ _complete_sign() {
 				service_name=$operand_1
 
 				if ! echo "$service_names" | grep "^$service_name\$" 1>/dev/null; then
-					return $EX_OK
+					return $EX_USAGE
 				fi
 
 				your_ids=$(cat "$SIGN_CONFIG_DIR/${service_name}_ids")
@@ -77,15 +77,21 @@ _complete_sign() {
 				return $EX_OK
 			;;
 
-			'init' | 'up' | 'migrate' )
+			'up' )
 				if [ -n "$cur" ]; then
-					return $EX_OK
+					return $EX_USAGE
 				fi
 
 				return $EX_OK
 			;;
+
+			'init' | 'migrate' )
+				return $EX_USAGE
+			;;
 		esac
 	fi
+
+	return $EX_USAGE
 }
 
 complete -F _complete_sign sign

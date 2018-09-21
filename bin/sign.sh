@@ -144,6 +144,7 @@ sign_init() {
 	touch "$SIGN_CONFIG_DIR/services"
 	chmod 604 "$SIGN_CONFIG_DIR/services"
 
+	# NOTE: この HMAC は $passphrase (secret_key) を認証します。
 	echo "$salt	$(hmac_sha256 "$salt" "$passphrase")" >"$SIGN_CONFIG_DIR/passphrase_hmac"
 
 	# TODO: COMMIT

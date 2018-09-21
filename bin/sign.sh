@@ -62,8 +62,8 @@ check_dependencies() {
 
 #
 # main init [<operand> ..]
-# main register [<operand> ..]
-# main get [<operand> ..]
+# main up [<operand> ..]
+# main in [<operand> ..]
 # main migrate [<operand> ..]
 #
 main() {
@@ -78,12 +78,12 @@ main() {
 			sign_init "$@"
 		;;
 
-		register )
-			sign_register "$@"
+		up )
+			sign_up "$@"
 		;;
 
-		get )
-			sign_get "$@"
+		in )
+			sign_in "$@"
 		;;
 
 		migrate )
@@ -150,9 +150,9 @@ sign_init() {
 }
 
 #
-# sign_register [<service name> [<your ID>]]
+# sign_up [<service name> [<your ID>]]
 #
-sign_register() {
+sign_up() {
 	unset service_name your_id
 
 	if ! [ $# -le 2 ]; then
@@ -244,9 +244,9 @@ sign_register() {
 }
 
 #
-# sign_get [<service name> [<your ID>]]
+# sign_in [<service name> [<your ID>]]
 #
-sign_get() {
+sign_in() {
 	unset service_name your_id
 
 	if ! [ $# -le 2 ]; then

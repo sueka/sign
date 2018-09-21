@@ -25,9 +25,9 @@ _complete_sign() {
 		if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 			COMPREPLY=($(compgen -W "init" -- "$cur"))
 		elif ! [ -f "$SIGN_CONFIG_DIR/services" ]; then
-			COMPREPLY=($(compgen -W "register migrate" -- "$cur"))
+			COMPREPLY=($(compgen -W "up migrate" -- "$cur"))
 		else
-			COMPREPLY=($(compgen -W "register get migrate" -- "$cur"))
+			COMPREPLY=($(compgen -W "up in migrate" -- "$cur"))
 		fi
 
 		return $EX_OK
@@ -35,7 +35,7 @@ _complete_sign() {
 
 	if (( $COMP_CWORD == 2 )); then
 		case "$subcommand" in
-			'register' )
+			'up' )
 				if [ -f "$SIGN_CONFIG_DIR/services" ]; then
 					service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 					COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
@@ -44,7 +44,7 @@ _complete_sign() {
 				return $EX_OK
 			;;
 
-			'get' )
+			'in' )
 				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
 
@@ -63,7 +63,7 @@ _complete_sign() {
 
 	if (( $COMP_CWORD == 3 )); then
 		case "$subcommand" in
-			'get' )
+			'in' )
 				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				service_name=$operand_1
 
@@ -77,7 +77,7 @@ _complete_sign() {
 				return $EX_OK
 			;;
 
-			'init' | 'register' | 'migrate' )
+			'init' | 'up' | 'migrate' )
 				if [ -n "$cur" ]; then
 					return $EX_OK
 				fi

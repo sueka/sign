@@ -80,7 +80,7 @@ test() {
 
 	main_test
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'sign_init'
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'sign_register'
+	PATH="$PATH_IGNORING_STTY" sign_up_test 'sign_up'
 
 	hexadecimal_to_duohexagesimal_test
 	hmac_sha256_test
@@ -102,7 +102,7 @@ main_test() {
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE 'main'
 
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'main init'
-	PATH="$PATH_IGNORING_STTY" sign_register_test 'main register'
+	PATH="$PATH_IGNORING_STTY" sign_up_test 'main up'
 }
 
 #
@@ -169,9 +169,9 @@ sign_init_test() {
 }
 
 #
-# setup_for_sign_register <passphrase>
+# setup_for_sign_up <passphrase>
 #
-setup_for_sign_register() {
+setup_for_sign_up() {
 	if ! [ $# -eq 1 ]; then
 		return $EX_USAGE
 	fi
@@ -183,25 +183,25 @@ setup_for_sign_register() {
 }
 
 #
-# sign_register_test <sign_register_command>
+# sign_up_test <sign_up_command>
 #
-sign_register_test() {
+sign_up_test() {
 	if ! [ $# -eq 1 ]; then
 		return $EX_USAGE
 	fi
 
-	sign_register_command=$1 && shift
+	sign_up_command=$1 && shift
 
-	setup_for_sign_register 'bad passphrase'
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_register_command GitHub sueka"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_register_command Twitter"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_register_command"
+	setup_for_sign_up 'bad passphrase'
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_up_command GitHub sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_up_command Twitter"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_up_command"
 
 	# すでにパスワードが発行されたことがあるサービスのパスワード長は尋ねられない。
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'J3kUxlp26HhPdLIQABxnQyAv45P5f4DvoRCtRtoH0yy' "echo '$passphrase${LF}pipibaoni' | $sign_register_command Twitter"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'J3kUxlp26HhPdLIQABxnQyAv45P5f4DvoRCtRtoH0yy' "echo '$passphrase${LF}pipibaoni' | $sign_up_command Twitter"
 
 	# すでにパスワードが発行されてゐる ID のパスワードは発行できない。
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_register_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_up_command"
 }
 
 #

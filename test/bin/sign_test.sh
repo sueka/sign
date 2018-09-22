@@ -192,7 +192,10 @@ sign_up_test() {
 
 	sign_up_command=$1 && shift
 
-	setup_for_sign_up 'bad passphrase'
+	passphrase='bad passphrase'
+
+	setup_for_sign_up "$passphrase"
+
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_up_command GitHub sueka"
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_up_command Twitter"
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_up_command"

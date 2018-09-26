@@ -146,6 +146,12 @@ sign_init_test() {
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.${LF}Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.' | $sign_init_command"
 
 	setup_for_sign_init
+	# passphrase は ASCII 印字可能文字（ U+0020 または ANSI INCITS 4 グラフィック文字）のみでなければならない。
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '	${LF}	' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '¿Dónde estoy?${LF}¿Dónde estoy?' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo 'パスフレーズ${LF}パスフレーズ' | $sign_init_command"
+
+	setup_for_sign_init
 	# passphrase と passphrase_again は完全に一致しなければならない。
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo 'passphrase${LF}passphrase ' | $sign_init_command"
 
@@ -163,9 +169,7 @@ sign_init_test() {
 
 	setup_for_sign_init
 	# 空白の種類は区別される。
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo ' $LF	' | $sign_init_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '	$LF　' | $sign_init_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '　$LF ' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo ' $LF　' | $sign_init_command"
 }
 
 #

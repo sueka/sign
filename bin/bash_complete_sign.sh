@@ -67,7 +67,7 @@ _complete_sign() {
 				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				service_name=$operand_1
 
-				if ! echo "$service_names" | grep "^$service_name\$" 1>/dev/null; then
+				if ! echo "$service_names" | grep -q "^$service_name\$"; then
 					return $EX_USAGE
 				fi
 

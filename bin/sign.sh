@@ -202,7 +202,7 @@ sign_up() {
 	fi
 
 	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する
-	if ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep "^$service_name\$" 1>/dev/null; then
+	if ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep -q "^$service_name\$"; then
 
 		# TODO: 似たサービス名を表示させる
 
@@ -231,7 +231,7 @@ sign_up() {
 	fi
 
 	# ID がすでに存在する場合
-	if grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null; then
+	if grep -q "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids"; then
 		echo_fatal "$service_name ID '$your_id' does already exist." >&2
 		return $EX_SOFTWARE
 	fi
@@ -296,7 +296,7 @@ sign_in() {
 	given_service_name=$service_name
 
 	# 指定されたサービス名がサービス一覧に存在しない場合
-	while ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep "^$service_name\$" 1>/dev/null
+	while ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep -q "^$service_name\$"
 	do
 		if command -v peco 1>/dev/null; then
 			service_name=$(
@@ -328,7 +328,7 @@ sign_in() {
 	your_given_id=$your_id
 
 	# 指定された ID が存在しない場合
-	while ! grep "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids" 1>/dev/null
+	while ! grep -q "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids"
 	do
 		if command -v peco 1>/dev/null; then
 			your_id=$(

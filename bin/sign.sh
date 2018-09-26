@@ -118,6 +118,18 @@ sign_init() {
 	IFS= read -r passphrase
 	echo
 
+	# エコーバックを再開させる
+	stty "$old_config"
+
+	if ! echo "$passphrase" | LC_ALL=C grep -q '^[ -~]*$'; then
+		echo_fatal 'Passphrase must be zero or more ASCII printable characters.'
+		return $EX_SOFTWARE
+	fi
+
+	# エコーバックを停止させる
+	old_config=$(stty -g)
+	stty -echo
+
 	printf %s 'Enter your passphrase again (invisible): '
 	IFS= read -r passphrase_again
 	echo

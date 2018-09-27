@@ -213,6 +213,16 @@ sign_up() {
 		your_id=$1 && shift
 	fi
 
+	# サービス名が空文字列の場合
+	if [ -z "$service_name" ]; then
+		return $EX_SOFTWARE
+	fi
+
+	# ID が空文字列の場合
+	if [ -z "$your_id" ]; then
+		return $EX_SOFTWARE
+	fi
+
 	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する
 	if ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep -q "^$service_name\$"; then
 

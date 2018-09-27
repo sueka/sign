@@ -90,6 +90,10 @@ main() {
 			sign_migrate "$@"
 		;;
 
+		list )
+			sign_list "$@"
+		;;
+
 		* )
 			echo_fatal "No subcommand '$subcommand' found." >&2
 			return $EX_USAGE
@@ -463,6 +467,37 @@ sign_migrate() {
 	done
 
 	echo_info 'Your passphrase is successfully changed.'
+}
+
+#
+# sign_list services
+# sign list ids <service name>
+#
+sign_list() {
+	if ! ([ $# -eq 1 ] || [ $# -eq 2 ]); then
+		return $EX_USAGE
+	fi
+
+	if [ $# -eq 1 ]; then
+		the_word_services=$1 && shift
+
+		if [ "$the_word_services" != 'services' ]; then
+			return $EX_USAGE
+		fi
+
+		cut -f1 $SIGN_CONFIG_DIR/services
+	elif [ $# -eq 2 ]; then
+		the_word_ids=$1 && shift
+		service_name=$1 && shift
+
+		if [ "$the_word_ids" != 'ids' ]; then
+			return $EX_USAGE
+		fi
+
+		cat $SIGN_CONFIG_DIR/${service_name}_ids
+	else
+		return $EX_SOFTWARE
+	fi
 }
 
 #

@@ -27,7 +27,7 @@ _complete_sign() {
 		elif ! [ -f "$SIGN_CONFIG_DIR/services" ]; then
 			COMPREPLY=($(compgen -W "up migrate" -- "$cur"))
 		else
-			COMPREPLY=($(compgen -W "up in migrate" -- "$cur"))
+			COMPREPLY=($(compgen -W "up in migrate list" -- "$cur"))
 		fi
 
 		return $EX_OK
@@ -47,6 +47,12 @@ _complete_sign() {
 			'in' )
 				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
+
+				return $EX_OK
+			;;
+
+			'list' )
+				COMPREPLY=($(compgen -W 'services ids' -- "$cur"))
 
 				return $EX_OK
 			;;
@@ -83,6 +89,21 @@ _complete_sign() {
 				fi
 
 				return $EX_OK
+			;;
+
+			'list' )
+				case "$operand_1" in
+					'services' )
+						return $EX_OK
+					;;
+
+					'ids' )
+						service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
+						COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
+
+						return $EX_OK
+					;;
+				esac
 			;;
 
 			'init' | 'migrate' )

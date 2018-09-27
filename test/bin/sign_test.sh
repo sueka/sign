@@ -133,6 +133,9 @@ sign_init_test() {
 	setup_for_sign_init
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo 'passphrase${LF}passphrase' | $sign_init_command"
 
+	# すでに初期化されている場合、初期化できない。
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "$sign_init_command"
+
 	setup_for_sign_init
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK "echo '#${LF}#' | $sign_init_command"
 

@@ -212,6 +212,12 @@ sign_up_test() {
 
 	# すでにパスワードが発行されてゐる ID のパスワードは発行できない。
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_up_command"
+
+	# サービス名と ID には空白以外の文字が含まれていなければならない。
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}${LF}sueka' | $sign_up_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF} ${LF}sueka' | $sign_up_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}MDN${LF}' | $sign_up_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}MDN${LF} ' | $sign_up_command"
 }
 
 #

@@ -148,13 +148,13 @@ sign_init() {
 	# TODO: BEGIN TRANSACTION
 
 	mkdir -p "$SIGN_CONFIG_DIR"
-	chmod 700 "$SIGN_CONFIG_DIR"
+	chmod 755 "$SIGN_CONFIG_DIR"
 
 	touch "$SIGN_CONFIG_DIR/passphrase_hmac"
 	chmod 600 "$SIGN_CONFIG_DIR/passphrase_hmac"
 
 	touch "$SIGN_CONFIG_DIR/services"
-	chmod 604 "$SIGN_CONFIG_DIR/services"
+	chmod 644 "$SIGN_CONFIG_DIR/services"
 
 	# NOTE: この HMAC は $passphrase (secret_key) を認証します。
 	echo "$salt	$(hmac_sha256 "$salt" "$passphrase")" >"$SIGN_CONFIG_DIR/passphrase_hmac"

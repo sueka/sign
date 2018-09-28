@@ -487,7 +487,7 @@ _abstract_complete() {
 
 	given_x=$x
 
-	# 指定された ID が存在しない場合
+	# 指定された値がリストに存在しない場合
 	while ! echo "$xs" | grep -q -- "^$x\$"
 	do
 		if command -v peco 1>/dev/null; then

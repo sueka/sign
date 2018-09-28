@@ -234,9 +234,9 @@ setup_for_sign_in() {
 
 	setup_for_sign_up "$passphrase"
 
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_up_command GitHub sueka"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_up_command Twitter"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_up_command"
+	echo "$passphrase${LF}" | sign_up GitHub sueka >/dev/null
+	echo "$passphrase${LF}hsueka${LF}" |  sign_up Twitter >/dev/null
+	echo "$passphrase${LF}Stack Overflow${LF}8795737${LF}" | sign_up >/dev/null
 }
 
 #
@@ -249,13 +249,13 @@ sign_in_test() {
 
 	sign_in_command=$1 && shift
 
-	passphrase='bad passphrase'
+	passphrase='yet another bad passphrase'
 
 	setup_for_sign_in "$passphrase"
 
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase' | $sign_in_command GitHub sueka"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase' | $sign_in_command Twitter hsueka"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase' | $sign_in_command 'Stack Overflow' 8795737"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'7ClATuq3RwLga0JwS8RKjQOwP2Vo3Iin1KFXRAizhzC' "echo '$passphrase' | $sign_in_command GitHub sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'Krth3pwvZ3X5h6HxrffbsA03aKeeyBGOA8EAFWXjmpd' "echo '$passphrase' | $sign_in_command Twitter hsueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'GVNAbTEQoH9UthEHCIfKPmJyYbFyXgIr8wfBAfFUny2' "echo '$passphrase' | $sign_in_command 'Stack Overflow' 8795737"
 }
 
 #

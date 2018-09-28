@@ -35,7 +35,7 @@ _complete_sign() {
 
 	if (( $COMP_CWORD == 2 )); then
 		case "$subcommand" in
-			'up' )
+			up )
 				if [ -f "$SIGN_CONFIG_DIR/services" ]; then
 					service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 					COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
@@ -44,20 +44,20 @@ _complete_sign() {
 				return $EX_OK
 			;;
 
-			'in' )
+			in )
 				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
 
 				return $EX_OK
 			;;
 
-			'list' )
+			list )
 				COMPREPLY=($(compgen -W 'services ids' -- "$cur"))
 
 				return $EX_OK
 			;;
 
-			'init' | 'migrate' )
+			init | migrate )
 				if [ -n "$cur" ]; then
 					return $EX_USAGE
 				fi
@@ -69,7 +69,7 @@ _complete_sign() {
 
 	if (( $COMP_CWORD == 3 )); then
 		case "$subcommand" in
-			'in' )
+			in )
 				service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 				service_name=$operand_1
 
@@ -83,7 +83,7 @@ _complete_sign() {
 				return $EX_OK
 			;;
 
-			'up' )
+			up )
 				if [ -n "$cur" ]; then
 					return $EX_USAGE
 				fi
@@ -91,13 +91,13 @@ _complete_sign() {
 				return $EX_OK
 			;;
 
-			'list' )
+			list )
 				case "$operand_1" in
-					'services' )
+					services )
 						return $EX_OK
 					;;
 
-					'ids' )
+					ids )
 						service_names=$(cut -f1 "$SIGN_CONFIG_DIR/services")
 						COMPREPLY=($(compgen -W "$service_names" -- "$cur"))
 
@@ -106,7 +106,7 @@ _complete_sign() {
 				esac
 			;;
 
-			'init' | 'migrate' )
+			init | migrate )
 				return $EX_USAGE
 			;;
 		esac

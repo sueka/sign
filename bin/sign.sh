@@ -383,10 +383,6 @@ sign_in() {
 
 	echo_info "$service_name ID '$your_id' chosen."
 
-	printf %s "$your_id" | xsel -bi
-	echo_info 'Your ID is stored in the clipboard.'
-	until_enter
-
 	copy_password "$service_name" "$your_id" "$passphrase"
 	echo_info 'Your password is stored in the clipboard.'
 }

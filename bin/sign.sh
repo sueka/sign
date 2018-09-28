@@ -478,25 +478,50 @@ sign_list() {
 		return $EX_USAGE
 	fi
 
-	if [ $# -eq 1 ]; then
-		the_word_services=$1 && shift
+	the_word_services_or_ids=$1 && shift
 
-		if [ "$the_word_services" != 'services' ]; then
-			return $EX_USAGE
-		fi
-
+	if [ "$the_word_services_or_ids" = 'services' ]; then
 		cut -f1 $SIGN_CONFIG_DIR/services
-	elif [ $# -eq 2 ]; then
-		the_word_ids=$1 && shift
-		service_name=$1 && shift
-
-		if [ "$the_word_ids" != 'ids' ]; then
-			return $EX_USAGE
+	elif [ "$the_word_services_or_ids" = 'ids' ]; then
+		if [ -z "$*" ]; then
+			service_name=
+		else
+			service_name=$1 && shift
 		fi
+
+		given_service_name=$service_name
+
+		# 指定されたサービス名がサービス一覧に存在しない場合
+		while ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep -q -- "^$service_name\$"
+		do
+			if command -v peco 1>/dev/null; then
+				service_name=$(
+					cut -f1 "$SIGN_CONFIG_DIR/services" |
+					peco --query "$given_service_name" --prompt 'Enter the service name: '
+				)
+			elif command -v percol 1>/dev/null; then
+				service_name=$(
+					cut -f1 "$SIGN_CONFIG_DIR/services" |
+					percol --query "$given_service_name" --prompt 'Enter the service name:  %q'
+				)
+			else
+				echo 'Choose a service:'
+
+				echo
+				cut -f1 "$SIGN_CONFIG_DIR/services" | while read -r line
+				do
+					echo_indented 2 "$line"
+				done
+				echo
+
+				printf %s 'Enter the service name: '
+				read -r service_name
+			fi
+		done
 
 		cat $SIGN_CONFIG_DIR/${service_name}_ids
 	else
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 }
 

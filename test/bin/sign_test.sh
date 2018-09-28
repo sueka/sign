@@ -81,6 +81,7 @@ test() {
 	main_test
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'sign_init'
 	PATH="$PATH_IGNORING_STTY" sign_up_test 'sign_up'
+	PATH="$PATH_IGNORING_STTY" sign_in_test 'sign_in'
 
 	hexadecimal_to_duohexagesimal_test
 	hmac_sha256_test
@@ -103,6 +104,7 @@ main_test() {
 
 	PATH="$PATH_IGNORING_STTY" sign_init_test 'main init'
 	PATH="$PATH_IGNORING_STTY" sign_up_test 'main up'
+	PATH="$PATH_IGNORING_STTY" sign_in_test 'main in'
 }
 
 #
@@ -218,6 +220,42 @@ sign_up_test() {
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF} ${LF}sueka' | $sign_up_command"
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}MDN${LF}' | $sign_up_command"
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_SOFTWARE "echo '$passphrase${LF}MDN${LF} ' | $sign_up_command"
+}
+
+#
+# setup_for_sign_in <passphrase>
+#
+setup_for_sign_in() {
+	if ! [ $# -eq 1 ]; then
+		return $EX_USAGE
+	fi
+
+	passphrase=$1 && shift
+
+	setup_for_sign_up "$passphrase"
+
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_up_command GitHub sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_up_command Twitter"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_up_command"
+}
+
+#
+# sign_in_test <sign_in_command>
+#
+sign_in_test() {
+	if ! [ $# -eq 1 ]; then
+		return $EX_USAGE
+	fi
+
+	sign_in_command=$1 && shift
+
+	passphrase='bad passphrase'
+
+	setup_for_sign_in "$passphrase"
+
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase' | $sign_in_command GitHub sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase' | $sign_in_command Twitter hsueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase' | $sign_in_command 'Stack Overflow' 8795737"
 }
 
 #

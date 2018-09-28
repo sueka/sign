@@ -319,67 +319,11 @@ sign_in() {
 		your_id=$1 && shift
 	fi
 
-	given_service_name=$service_name
-
-	# 指定されたサービス名がサービス一覧に存在しない場合
-	while ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep -q -- "^$service_name\$"
-	do
-		if command -v peco 1>/dev/null; then
-			service_name=$(
-				cut -f1 "$SIGN_CONFIG_DIR/services" |
-				peco --query "$given_service_name" --prompt 'Enter the service name: '
-			)
-		elif command -v percol 1>/dev/null; then
-			service_name=$(
-				cut -f1 "$SIGN_CONFIG_DIR/services" |
-				percol --query "$given_service_name" --prompt 'Enter the service name:  %q'
-			)
-		else
-			echo 'Choose a service:'
-
-			echo
-			cut -f1 "$SIGN_CONFIG_DIR/services" | while read -r line
-			do
-				echo_indented 2 "$line"
-			done
-			echo
-
-			printf %s 'Enter the service name: '
-			read -r service_name
-		fi
-	done
+	service_name=$(complete_as_service_name "$service_name")
 
 	echo_info "Service '$service_name' chosen."
 
-	your_given_id=$your_id
-
-	# 指定された ID が存在しない場合
-	while ! grep -q -- "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids"
-	do
-		if command -v peco 1>/dev/null; then
-			your_id=$(
-				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
-				peco --query "$your_given_id" --prompt "Enter an ID of yours for $service_name: "
-			)
-		elif command -v percol 1>/dev/null; then
-			your_id=$(
-				cat "$SIGN_CONFIG_DIR/${service_name}_ids" |
-				percol --query "$your_given_id" --prompt "Enter an ID of yours for $service_name:  %q"
-			)
-		else
-			echo "Choose your $service_name ID:"
-
-			echo
-			cat "$SIGN_CONFIG_DIR/${service_name}_ids" | while read -r line
-			do
-				echo_indented 2 "$line"
-			done
-			echo
-
-			printf %s "Enter an ID of yours for $service_name: "
-			read -r your_id
-		fi
-	done
+	your_id=$(complete_as_your_id "$service_name" "$your_id")
 
 	echo_info "$service_name ID '$your_id' chosen."
 
@@ -485,40 +429,93 @@ sign_list() {
 			service_name=$1 && shift
 		fi
 
-		given_service_name=$service_name
-
-		# 指定されたサービス名がサービス一覧に存在しない場合
-		while ! cut -f1 "$SIGN_CONFIG_DIR/services" | grep -q -- "^$service_name\$"
-		do
-			if command -v peco 1>/dev/null; then
-				service_name=$(
-					cut -f1 "$SIGN_CONFIG_DIR/services" |
-					peco --query "$given_service_name" --prompt 'Enter the service name: '
-				)
-			elif command -v percol 1>/dev/null; then
-				service_name=$(
-					cut -f1 "$SIGN_CONFIG_DIR/services" |
-					percol --query "$given_service_name" --prompt 'Enter the service name:  %q'
-				)
-			else
-				echo 'Choose a service:'
-
-				echo
-				cut -f1 "$SIGN_CONFIG_DIR/services" | while read -r line
-				do
-					echo_indented 2 "$line"
-				done
-				echo
-
-				printf %s 'Enter the service name: '
-				read -r service_name
-			fi
-		done
+		service_name=$(complete_as_service_name "$service_name")
 
 		cat $SIGN_CONFIG_DIR/${service_name}_ids
 	else
 		return $EX_USAGE
 	fi
+}
+
+#
+# complete_as_service_name <service name>
+#
+complete_as_service_name() {
+	if ! [ $# -eq 1 ]; then
+		return $EX_USAGE
+	fi
+
+	service_name=$1 && shift
+
+	_abstract_complete \
+		"$service_name" \
+		"$(cut -f1 "$SIGN_CONFIG_DIR/services")" \
+		"Choose a service:" \
+		"Enter the service name"
+}
+
+#
+# complete_as_your_id <service name> <your id>
+#
+complete_as_your_id() {
+	if ! [ $# -eq 2 ]; then
+		return $EX_USAGE
+	fi
+
+	service_name=$1 && shift
+	your_id=$1 && shift
+
+	_abstract_complete \
+		"$your_id" \
+		"$(cat "$SIGN_CONFIG_DIR/${service_name}_ids")" \
+		"Choose your $service_name ID:" \
+		"Enter an ID of yours for $service_name"
+}
+
+#
+# _abstract_complete <x> <xs> <choose_prompt> <enter_prompt>
+#
+_abstract_complete() {
+	if ! [ $# -eq 4 ]; then
+		return $EX_USAGE
+	fi
+
+	x=$1 && shift
+	xs=$1 && shift
+	choose_prompt=$1 && shift
+	enter_prompt=$1 && shift
+
+	given_x=$x
+
+	# 指定された ID が存在しない場合
+	while ! echo "$xs" | grep -q -- "^$x\$"
+	do
+		if command -v peco 1>/dev/null; then
+			x=$(
+				echo "$xs" |
+				peco --query "$given_x" --prompt "$enter_prompt: "
+			)
+		elif command -v percol 1>/dev/null; then
+			x=$(
+				echo "$xs" |
+				percol --query "$given_x" --prompt "$enter_prompt:  %q"
+			)
+		else
+			echo "$choose_prompt"
+
+			echo
+			echo "$xs" | while read -r line
+			do
+				echo_indented 2 "$line"
+			done
+			echo
+
+			printf %s "$enter_prompt: "
+			read -r x
+		fi
+	done
+
+	printf %s "$x"
 }
 
 #

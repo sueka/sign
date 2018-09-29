@@ -217,13 +217,13 @@ sign_up() {
 		your_id=$1 && shift
 	fi
 
-	if ! echo "$service_name" | LC_ALL=C grep -q '^[ -~]\+$'; then
-		echo_fatal 'Service name must be one or more ASCII printable characters.'
+	if ! echo "$service_name" | LC_ALL=C grep -q '^[!-~]\+\( \+[!-~]\+\)*$'; then
+		echo_fatal 'Service name must be one or more ASCII printable characters with no SPACEs at the both ends.'
 		return $EX_SOFTWARE
 	fi
 
-	if ! echo "$your_id" | LC_ALL=C grep -q '^[ -~]\+$'; then
-		echo_fatal 'ID must be one or more ASCII printable characters.'
+	if ! echo "$your_id" | LC_ALL=C grep -q '^[!-~]\+\( \+[!-~]\+\)*$'; then
+		echo_fatal 'ID must be one or more ASCII printable characters with no SPACEs at the both ends.'
 		return $EX_SOFTWARE
 	fi
 

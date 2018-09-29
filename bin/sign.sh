@@ -217,13 +217,13 @@ sign_up() {
 		your_id=$1 && shift
 	fi
 
-	# サービス名が空文字列の場合
-	if [ -z "$service_name" ]; then
+	if ! echo "$service_name" | LC_ALL=C grep -q '^[ -~]\+$'; then
+		echo_fatal 'Service name must be one or more ASCII printable characters.'
 		return $EX_SOFTWARE
 	fi
 
-	# ID が空文字列の場合
-	if [ -z "$your_id" ]; then
+	if ! echo "$your_id" | LC_ALL=C grep -q '^[ -~]\+$'; then
+		echo_fatal 'ID must be one or more ASCII printable characters.'
 		return $EX_SOFTWARE
 	fi
 

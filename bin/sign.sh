@@ -204,7 +204,7 @@ sign_up() {
 	# 第1オプション無しで呼ばれた場合、サービス名を尋ねる
 	if [ -z "$*" ]; then
 		printf %s 'Enter the service name: '
-		read -r service_name
+		IFS= read -r service_name
 	else
 		service_name=$1 && shift
 	fi
@@ -212,7 +212,7 @@ sign_up() {
 	# 第2オプション無しで呼ばれた場合、 ID を尋ねる
 	if [ -z "$*" ]; then
 		printf %s "Enter an ID of yours for $service_name: "
-		read -r your_id
+		IFS= read -r your_id
 	else
 		your_id=$1 && shift
 	fi
@@ -504,7 +504,7 @@ _abstract_complete() {
 			echo "$choose_prompt"
 
 			echo
-			echo "$xs" | while read -r line
+			echo "$xs" | while IFS= read -r line
 			do
 				echo_indented 2 "$line"
 			done
@@ -573,7 +573,7 @@ hexadecimal_to_duohexagesimal() {
 # bc_with_no_linefeeds [-l] [<file> ..]
 #
 bc_with_no_linefeeds() {
-	while read line
+	while read -r line
 	do
 		echo "$line"
 	done | bc "$@" | sed ':_;N;$!b_;s/\\\n//g'
@@ -654,7 +654,7 @@ until_enter() {
 	while true
 	do
 		printf %s 'Press the enter key. '
-		IFS= read dummy </dev/tty
+		IFS= read -r dummy </dev/tty
 
 		if [ -z "$dummy" ]; then
 			break

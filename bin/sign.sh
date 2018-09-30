@@ -233,11 +233,11 @@ sign_up() {
 		# TODO: 似たサービス名を表示させる
 
 		# パスワードの長さを尋ねる
-		printf "Enter the password length you need (1-44) [44]: "
+		printf "Enter the password length you need (1-43) [43]: "
 		read password_length
 
 		if [ -z "$password_length" ]; then
-			password_length=44
+			password_length=43
 		fi
 
 		if ! [ "$password_length" -eq "$password_length" ]; then
@@ -245,8 +245,8 @@ sign_up() {
 			return $EX_USAGE
 		fi
 
-		if ! ([ 1 -le "$password_length" ] && [ "$password_length" -le 44 ]); then
-			echo_fatal 'The password length must be between 1 and 44.'
+		if ! ([ 1 -le "$password_length" ] && [ "$password_length" -le 43 ]); then
+			echo_fatal 'The password length must be between 1 and 43.'
 			return $EX_USAGE
 		fi
 

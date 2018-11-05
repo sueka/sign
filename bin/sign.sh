@@ -52,8 +52,8 @@ check_dependencies() {
 		ex=$EX_UNAVAILABLE
 	fi
 
-	if ! command -v xsel 1>/dev/null; then
-		echo_fatal "No command 'xsel' found." >&2
+	if ! command -v xsel 1>/dev/null && ! command -v pbcopy 1>/dev/null; then
+		echo_fatal "No command 'xsel' nor 'pbcopy' found." >&2
 		ex=$EX_UNAVAILABLE
 	fi
 
@@ -147,7 +147,7 @@ sign_init() {
 	fi
 
 	# salt を生成する
-	salt=$(tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
+	salt=$(LC_CTYPE=C tr -dc [:alnum:] </dev/urandom | dd bs=1024 count=1 2>/dev/null)
 
 	# TODO: BEGIN TRANSACTION
 
@@ -392,7 +392,7 @@ sign_migrate() {
 		do
 			echo_info "Changing your password for $service_name ID '$your_id'.."
 
-			printf %s "$your_id" | xsel -bi
+			printf %s "$your_id" | ubiquitous_pbcopy
 			echo_info "Your ID '$your_id' is stored in the clipboard."
 			until_enter
 
@@ -536,7 +536,7 @@ copy_password() {
 		hexadecimal_to_duohexagesimal "$(hmac_sha256 "$service_name$LF$your_id" "$passphrase")" |
 		cut -c"-$password_length"
 	)
-	printf %s "$password" | xsel -bi
+	printf %s "$password" | ubiquitous_pbcopy
 }
 
 #
@@ -577,6 +577,25 @@ bc_with_no_linefeeds() {
 	do
 		echo "$line"
 	done | bc "$@" | sed ':_;N;$!b_;s/\\\n//g'
+}
+
+#
+# ubiquitous_pbcopy
+#
+ubiquitous_pbcopy() {
+	if command -v xsel 1>/dev/null; then
+		while read -r line
+		do
+			echo "$line"
+		done | xsel -bi
+	elif command -v pbcopy 1>/dev/null; then
+		while read -r line
+		do
+			echo "$line"
+		done | pbcopy
+	else
+		return $EX_SOFTWARE
+	fi
 }
 
 #

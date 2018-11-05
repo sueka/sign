@@ -111,7 +111,7 @@ sign_init() {
 
 	if [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal "'$SIGN_CONFIG_DIR' does already exist." >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# エコーバックを停止させる
@@ -127,7 +127,7 @@ sign_init() {
 
 	if ! echo "$passphrase" | LC_ALL=C grep -q '^[ -~]*$'; then
 		echo_fatal 'Passphrase must be zero or more ASCII printable characters.'
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# エコーバックを停止させる
@@ -143,7 +143,7 @@ sign_init() {
 
 	if [ "$passphrase" != "$passphrase_again" ]; then
 		echo_fatal 'Passphrases do not match.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# salt を生成する
@@ -178,7 +178,7 @@ sign_up() {
 
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# エコーバックを停止させる
@@ -198,7 +198,7 @@ sign_up() {
 	# passphrase が誤っている場合
 	if [ $(hmac_sha256 "$salt" "$passphrase") != "$passphrase_hmac" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# 第1オプション無しで呼ばれた場合、サービス名を尋ねる
@@ -219,12 +219,12 @@ sign_up() {
 
 	if ! echo "$service_name" | LC_ALL=C grep -q '^[!-~]\+\( \+[!-~]\+\)*$'; then
 		echo_fatal 'Service name must be one or more ASCII printable characters with no SPACEs at the both ends.'
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	if ! echo "$your_id" | LC_ALL=C grep -q '^[!-~]\+\( \+[!-~]\+\)*$'; then
 		echo_fatal 'ID must be one or more ASCII printable characters with no SPACEs at the both ends.'
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# 指定されたサービス名がサービス名一覧に存在しない場合、作成する
@@ -259,7 +259,7 @@ sign_up() {
 	# ID がすでに存在する場合
 	if grep -q -- "^$your_id\$" "$SIGN_CONFIG_DIR/${service_name}_ids"; then
 		echo_fatal "$service_name ID '$your_id' does already exist." >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# TODO: 似た ID を表示させる
@@ -282,7 +282,7 @@ sign_in() {
 
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# エコーバックを停止させる
@@ -302,7 +302,7 @@ sign_in() {
 	# passphrase が誤っている場合
 	if [ $(hmac_sha256 "$salt" "$passphrase") != "$passphrase_hmac" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# 第1オプション無しで呼ばれた場合、サービス名の設定を後回しにする
@@ -341,7 +341,7 @@ sign_migrate() {
 
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	salt=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f1)
@@ -361,7 +361,7 @@ sign_migrate() {
 	# old_passphrase が誤っている場合
 	if [ $(hmac_sha256 "$salt" "$old_passphrase") != "$old_passphrase_hmac" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	# エコーバックを停止させる
@@ -381,7 +381,7 @@ sign_migrate() {
 
 	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
 		echo_fatal 'New passphrases do not match.' >&2
-		return $EX_SOFTWARE
+		return $EX_USAGE
 	fi
 
 	echo "$salt	$(hmac_sha256 "$salt" "$new_passphrase")" >"$SIGN_CONFIG_DIR/passphrase_hmac"

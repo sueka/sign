@@ -32,7 +32,7 @@ git pull origin master
 ### Dependencies
 
 - `openssl`
-- `xsel`
+- `xsel` or `pbcopy`
 - `peco` or `percol` (optional)
 
 Enabling the Bash auto completion, type `sign ` and hit the <kbd>Tab</kbd> twice.

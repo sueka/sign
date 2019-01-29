@@ -573,26 +573,17 @@ hexadecimal_to_duohexagesimal() {
 # bc_with_no_linefeeds [-l] [<file> ..]
 #
 bc_with_no_linefeeds() {
-	while read -r line
-	do
-		echo "$line"
-	done | bc "$@" | sed ':_;N;$!b_;s/\\\n//g'
+	bc "$@" </dev/stdin | sed ':_;N;$!b_;s/\\\n//g'
 }
 
 #
 # ubiquitous_pbcopy
 #
 ubiquitous_pbcopy() {
-	if command -v xsel 1>/dev/null; then
-		while read -r line
-		do
-			echo "$line"
-		done | xsel -bi
-	elif command -v pbcopy 1>/dev/null; then
-		while read -r line
-		do
-			echo "$line"
-		done | pbcopy
+	if command -v xsel >/dev/null; then
+		xsel -bi </dev/stdin
+	elif command -v pbcopy >/dev/null; then
+		pbcopy </dev/stdin
 	else
 		return $EX_SOFTWARE
 	fi

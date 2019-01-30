@@ -179,7 +179,7 @@ sign_init_test() {
 
 	setup_for_sign_init
 	# 空白の種類は区別される。
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo ' $LF　' | $sign_init_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo ' ${LF}　' | $sign_init_command"
 }
 
 #
@@ -361,7 +361,7 @@ assert() {
 	actual_stdout=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stdout")
 	actual_stderr=$(cat "$PROJECT_ROOT_DIR/test/tmp/dev/stderr")
 
-	actual_clipboard_selection=$(xsel -bo)
+	actual_clipboard_selection=$(ubiquitous_pbpaste)
 
 	if ${expected_exit_status+:} false; then
 		if [ "$actual_exit_status" -eq "$expected_exit_status" ]; then
@@ -393,6 +393,19 @@ assert() {
 		else
 			report_failure "'$command' is expected to store $expected_clipboard_selection into the clipboard, but it stored $actual_clipboard_selection."
 		fi
+	fi
+}
+
+#
+# ubiquitous_pbpaste
+#
+ubiquitous_pbpaste() {
+	if command -v xsel >/dev/null; then
+		xsel -bo >/dev/stdout
+	elif command -v pbpaste >/dev/null; then
+		pbpaste >/dev/stdout
+	else
+		return $EX_SOFTWARE
 	fi
 }
 

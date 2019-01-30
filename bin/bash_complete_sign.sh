@@ -19,7 +19,7 @@ _complete_sign() {
 		return $EX_USAGE
 	fi
 
-	# $COMP_CWORD >= 1
+	# ASSERT: $COMP_CWORD >= 1
 
 	if (( $COMP_CWORD == 1 )); then
 		if ! [ -d "$SIGN_CONFIG_DIR" ]; then

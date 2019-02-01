@@ -14,7 +14,7 @@ git clone --depth=1 https://github.com/sueka/sign.git /opt/local/sign
 
 sudo ln -s /opt/local/sign/bin/sign.sh /usr/local/bin/sign
 
-# Bash auto completion
+# Bash completion
 echo '. /opt/local/sign/bin/bash_complete_sign.sh' >>~/.bashrc
 ```
 
@@ -33,7 +33,7 @@ git pull origin master
 
 - `openssl`
 - `xsel` or `pbcopy`
-- `peco` or `percol` (optional)
+- `xsel` or `pbpaste` (for testing)
 
 Enabling the Bash auto completion, type `sign ` and hit the <kbd>Tab</kbd> twice.
 

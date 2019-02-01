@@ -336,7 +336,7 @@ assert() {
 		esac
 	done
 
-	shift $((OPTIND - 1))
+	shift "$((OPTIND - 1))"
 
 	if ! [ $# -eq 1 ]; then
 		return $EX_USAGE

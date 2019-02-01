@@ -313,7 +313,7 @@ bc_with_no_linefeeds_test() {
 assert() {
 	unset expected_exit_status expected_stdout expected_stderr expected_clipboard_selection
 
-	OPTIND=
+	OPTIND=0
 
 	while getopts x:o:e:b: OPT
 	do

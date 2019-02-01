@@ -206,28 +206,28 @@ sign_up_test() {
 	setup_for_sign_up "$passphrase"
 
 	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'IlBlgUAGgtsvGzoEkDNulCQkit3B8aS5K85o7LNdqAs' "echo '$passphrase${LF}' | $sign_up_command GitHub sueka"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}hsueka${LF}' | $sign_up_command Twitter"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}Stack Overflow${LF}8795737${LF}' | $sign_up_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'hAtxIU8wGZIIOoYPJqKSkzGvXnEx48rUEmLoXWy4pSO' "echo '$passphrase${LF}' | $sign_up_command Twitter hsueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'UYNUK1Q3zEulUmKtJFMMJRKbwFQ6FKe1rEuqLfjsEHb' "echo '$passphrase${LF}' | $sign_up_command 'Stack Overflow' 8795737"
 
 	# すでにパスワードが発行されたことがあるサービスのパスワード長は尋ねられない。
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'J3kUxlp26HhPdLIQABxnQyAv45P5f4DvoRCtRtoH0yy' "echo '$passphrase${LF}pipibaoni' | $sign_up_command Twitter"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_OK -b'J3kUxlp26HhPdLIQABxnQyAv45P5f4DvoRCtRtoH0yy' "echo '$passphrase${LF}' | $sign_up_command Twitter pipibaoni"
 
 	# すでにパスワードが発行されてゐる ID のパスワードは発行できない。
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}GitHub${LF}sueka' | $sign_up_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command GitHub sueka"
 
 	# サービス名と ID は空文字列であってはならない。
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}${LF}sueka' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}MDN${LF}' | $sign_up_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command '' sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command MDN ''"
 
 	# サービス名と ID は先頭または末尾にスペースを含んでいてはならない
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF} GitHub${LF}sueka' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}GitHub ${LF}sueka' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF} GitHub ${LF}sueka' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF} ${LF}sueka' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}MDN${LF} sueka' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}MDN${LF}sueka ' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}MDN${LF} sueka ' | $sign_up_command"
-	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}MDN${LF} ' | $sign_up_command"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command ' GitHub' sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command 'GitHub ' sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command ' GitHub ' sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command ' ' sueka"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command MDN ' sueka'"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command MDN 'sueka '"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command MDN ' sueka '"
+	PATH="$PATH_IGNORING_STTY" assert -x $EX_USAGE "echo '$passphrase${LF}' | $sign_up_command MDN ' '"
 }
 
 #
@@ -243,8 +243,8 @@ setup_for_sign_in() {
 	setup_for_sign_up "$passphrase"
 
 	echo "$passphrase${LF}" | sign_up GitHub sueka >/dev/null
-	echo "$passphrase${LF}hsueka${LF}" |  sign_up Twitter >/dev/null
-	echo "$passphrase${LF}Stack Overflow${LF}8795737${LF}" | sign_up >/dev/null
+	echo "$passphrase${LF}" | sign_up Twitter hsueka >/dev/null
+	echo "$passphrase${LF}" | sign_up 'Stack Overflow' 8795737 >/dev/null
 }
 
 #

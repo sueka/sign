@@ -65,6 +65,7 @@ check_dependencies() {
 # main up [<operand> ..]
 # main in [<operand> ..]
 # main migrate [<operand> ..]
+# main list [<operand> ..]
 #
 main() {
 	if ! [ 1 -le $# ]; then
@@ -379,7 +380,7 @@ sign_migrate() {
 
 #
 # sign_list services
-# sign list ids <service name>
+# sign_list ids <service name>
 #
 sign_list() {
 	if ! ([ $# -eq 1 ] || [ $# -eq 2 ]); then
@@ -406,7 +407,7 @@ sign_list() {
 }
 
 #
-# copy_password <service name> <your id> <passphrase>
+# copy_password <service name> <your ID> <passphrase>
 #
 copy_password() {
 	if ! [ $# -eq 3 ]; then

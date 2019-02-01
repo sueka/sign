@@ -167,14 +167,17 @@ sign_init() {
 }
 
 #
-# sign_up [<service name> [<your ID>]]
+# sign_up <service name> <your ID>
 #
 sign_up() {
 	unset service_name your_id
 
-	if ! [ $# -le 2 ]; then
+	if ! [ $# -eq 2 ]; then
 		return $EX_USAGE
 	fi
+
+	service_name=$1 && shift
+	your_id=$1 && shift
 
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
@@ -199,22 +202,6 @@ sign_up() {
 	if [ $(hmac_sha256 "$salt" "$passphrase") != "$passphrase_hmac" ]; then
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_USAGE
-	fi
-
-	# 第1オプション無しで呼ばれた場合、サービス名を尋ねる
-	if [ -z "$*" ]; then
-		printf %s 'Enter the service name: '
-		IFS= read -r service_name
-	else
-		service_name=$1 && shift
-	fi
-
-	# 第2オプション無しで呼ばれた場合、 ID を尋ねる
-	if [ -z "$*" ]; then
-		printf %s "Enter an ID of yours for $service_name: "
-		IFS= read -r your_id
-	else
-		your_id=$1 && shift
 	fi
 
 	if ! echo "$service_name" | LC_ALL=C grep -q '^[!-~]\+\( \+[!-~]\+\)*$'; then
@@ -271,14 +258,17 @@ sign_up() {
 }
 
 #
-# sign_in [<service name> [<your ID>]]
+# sign_in <service name> <your ID>
 #
 sign_in() {
 	unset service_name your_id
 
-	if ! [ $# -le 2 ]; then
+	if ! [ $# -eq 2 ]; then
 		return $EX_USAGE
 	fi
+
+	service_name=$1 && shift
+	your_id=$1 && shift
 
 	if ! [ -d "$SIGN_CONFIG_DIR" ]; then
 		echo_fatal 'Not initialized.' >&2
@@ -304,28 +294,6 @@ sign_in() {
 		echo_fatal 'Passphrase is wrong.' >&2
 		return $EX_USAGE
 	fi
-
-	# 第1オプション無しで呼ばれた場合、サービス名の設定を後回しにする
-	if [ -z "$*" ]; then
-		service_name=
-	else
-		service_name=$1 && shift
-	fi
-
-	# 第2オプション無しで呼ばれた場合、 ID の設定を後回しにする
-	if [ -z "$*" ]; then
-		your_id=
-	else
-		your_id=$1 && shift
-	fi
-
-	service_name=$(complete_as_service_name "$service_name")
-
-	echo_info "Service '$service_name' chosen."
-
-	your_id=$(complete_as_your_id "$service_name" "$your_id")
-
-	echo_info "$service_name ID '$your_id' chosen."
 
 	copy_password "$service_name" "$your_id" "$passphrase"
 	echo_info 'Your password is stored in the clipboard.'
@@ -435,87 +403,6 @@ sign_list() {
 	else
 		return $EX_USAGE
 	fi
-}
-
-#
-# complete_as_service_name <service name>
-#
-complete_as_service_name() {
-	if ! [ $# -eq 1 ]; then
-		return $EX_USAGE
-	fi
-
-	service_name=$1 && shift
-
-	_abstract_complete \
-		"$service_name" \
-		"$(cut -f1 "$SIGN_CONFIG_DIR/services")" \
-		"Choose a service:" \
-		"Enter the service name"
-}
-
-#
-# complete_as_your_id <service name> <your id>
-#
-complete_as_your_id() {
-	if ! [ $# -eq 2 ]; then
-		return $EX_USAGE
-	fi
-
-	service_name=$1 && shift
-	your_id=$1 && shift
-
-	_abstract_complete \
-		"$your_id" \
-		"$(cat "$SIGN_CONFIG_DIR/${service_name}_ids")" \
-		"Choose your $service_name ID:" \
-		"Enter an ID of yours for $service_name"
-}
-
-#
-# _abstract_complete <x> <xs> <choose_prompt> <enter_prompt>
-#
-_abstract_complete() {
-	if ! [ $# -eq 4 ]; then
-		return $EX_USAGE
-	fi
-
-	x=$1 && shift
-	xs=$1 && shift
-	choose_prompt=$1 && shift
-	enter_prompt=$1 && shift
-
-	given_x=$x
-
-	# 指定された値がリストに存在しない場合
-	while ! echo "$xs" | grep -q -- "^$x\$"
-	do
-		if command -v peco 1>/dev/null; then
-			x=$(
-				echo "$xs" |
-				peco --query "$given_x" --prompt "$enter_prompt: "
-			)
-		elif command -v percol 1>/dev/null; then
-			x=$(
-				echo "$xs" |
-				percol --query "$given_x" --prompt "$enter_prompt:  %q"
-			)
-		else
-			echo "$choose_prompt"
-
-			echo
-			echo "$xs" | while IFS= read -r line
-			do
-				echo_indented 2 "$line"
-			done
-			echo
-
-			printf %s "$enter_prompt: "
-			read -r x
-		fi
-	done
-
-	printf %s "$x"
 }
 
 #

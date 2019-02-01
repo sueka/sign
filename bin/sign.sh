@@ -383,7 +383,7 @@ sign_migrate() {
 # sign_list ids <service name>
 #
 sign_list() {
-	if ! ([ $# -eq 1 ] || [ $# -eq 2 ]); then
+	if ! [ 1 -le $# ]; then
 		return $EX_USAGE
 	fi
 
@@ -392,13 +392,11 @@ sign_list() {
 	if [ "$the_word_services_or_ids" = 'services' ]; then
 		cut -f1 $SIGN_CONFIG_DIR/services
 	elif [ "$the_word_services_or_ids" = 'ids' ]; then
-		if [ -z "$*" ]; then
-			service_name=
-		else
-			service_name=$1 && shift
+		if ! [ $# -eq 1 ]; then
+			return $EX_USAGE
 		fi
 
-		service_name=$(complete_as_service_name "$service_name")
+		service_name=$1 && shift
 
 		cat $SIGN_CONFIG_DIR/${service_name}_ids
 	else

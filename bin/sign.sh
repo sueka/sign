@@ -69,6 +69,12 @@ check_dependencies() {
 #
 main() {
 	if ! [ 1 -le $# ]; then
+		echo 'Usage:  sign init'
+		echo '        sign up <service name> <your ID>'
+		echo '        sign in <service name> <your ID>'
+		echo '        sign migrate'
+		echo '        sign list services'
+		echo '        sign list ids <service name>'
 		return $EX_USAGE
 	fi
 
@@ -107,6 +113,7 @@ main() {
 #
 sign_init() {
 	if ! [ $# -eq 0 ]; then
+		echo 'Usage:  sign init'
 		return $EX_USAGE
 	fi
 
@@ -174,6 +181,7 @@ sign_up() {
 	unset service_name your_id
 
 	if ! [ $# -eq 2 ]; then
+		echo 'Usage:  sign up <service name> <your ID>'
 		return $EX_USAGE
 	fi
 
@@ -265,6 +273,7 @@ sign_in() {
 	unset service_name your_id
 
 	if ! [ $# -eq 2 ]; then
+		echo 'Usage:  sign in <service name> <your ID>'
 		return $EX_USAGE
 	fi
 
@@ -305,6 +314,7 @@ sign_in() {
 #
 sign_migrate() {
 	if ! [ $# -eq 0 ]; then
+		echo 'Usage:  sign migrate'
 		return $EX_USAGE
 	fi
 
@@ -384,6 +394,8 @@ sign_migrate() {
 #
 sign_list() {
 	if ! [ 1 -le $# ]; then
+		echo 'Usage:  sign list services'
+		echo '        sign list ids <service name>'
 		return $EX_USAGE
 	fi
 
@@ -393,6 +405,7 @@ sign_list() {
 		cut -f1 $SIGN_CONFIG_DIR/services
 	elif [ "$the_word_services_or_ids" = 'ids' ]; then
 		if ! [ $# -eq 1 ]; then
+			echo 'Usage:  sign list ids <service name>'
 			return $EX_USAGE
 		fi
 
@@ -400,6 +413,8 @@ sign_list() {
 
 		cat $SIGN_CONFIG_DIR/${service_name}_ids
 	else
+		echo 'Usage:  sign list services'
+		echo '        sign list ids <service name>'
 		return $EX_USAGE
 	fi
 }

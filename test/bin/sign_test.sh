@@ -47,13 +47,8 @@ NAME=$(basename "$0")
 check_dependencies() {
 	ex=$EX_OK
 
-	if ! command -v openssl 1>/dev/null; then
-		echo_fatal "No command 'openssl' found." >&2
-		ex=$EX_UNAVAILABLE
-	fi
-
-	if ! command -v xsel 1>/dev/null && ! command -v pbcopy 1>/dev/null; then
-		echo_fatal "No command 'xsel' nor 'pbcopy' found." >&2
+	if ! command -v xsel 1>/dev/null && ! command -v pbpaste 1>/dev/null; then
+		echo_fatal "No command 'xsel' nor 'pbpaste' found." >&2
 		ex=$EX_UNAVAILABLE
 	fi
 

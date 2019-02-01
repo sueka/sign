@@ -573,7 +573,7 @@ hexadecimal_to_duohexagesimal() {
 # bc_with_no_linefeeds [-l] [<file> ..]
 #
 bc_with_no_linefeeds() {
-	bc "$@" </dev/stdin | sed ':_;N;$!b_;s/\\\n//g'
+	bc "$@" </dev/stdin | sed -e':_' -e'$!N' -e'$!b_' -e's/\\\n//g'
 }
 
 #

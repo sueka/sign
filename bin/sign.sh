@@ -122,32 +122,14 @@ sign_init() {
 		return $EX_USAGE
 	fi
 
-	# エコーバックを停止させる
-	old_config=$(stty -g)
-	stty -echo
-
-	printf %s 'Enter your passphrase (invisible): '
-	IFS= read -r passphrase
-	echo
-
-	# エコーバックを再開させる
-	stty "$old_config"
+	ask_passphrase 'Enter your passphrase (invisible): ' passphrase
 
 	if ! echo "$passphrase" | LC_ALL=C grep -q '^[ -~]*$'; then
 		echo_fatal 'Passphrase must be zero or more ASCII printable characters.'
 		return $EX_USAGE
 	fi
 
-	# エコーバックを停止させる
-	old_config=$(stty -g)
-	stty -echo
-
-	printf %s 'Enter your passphrase again (invisible): '
-	IFS= read -r passphrase_again
-	echo
-
-	# エコーバックを再開させる
-	stty "$old_config"
+	ask_passphrase 'Enter your passphrase again (invisible): ' passphrase_again
 
 	if [ "$passphrase" != "$passphrase_again" ]; then
 		echo_fatal 'Passphrases do not match.' >&2
@@ -193,16 +175,7 @@ sign_up() {
 		return $EX_USAGE
 	fi
 
-	# エコーバックを停止させる
-	old_config=$(stty -g)
-	stty -echo
-
-	printf %s 'Enter your passphrase (invisible): '
-	IFS= read -r passphrase
-	echo
-
-	# エコーバックを再開させる
-	stty "$old_config"
+	ask_passphrase 'Enter your passphrase (invisible): ' passphrase
 
 	salt=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f1)
 	passphrase_hmac=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f2)
@@ -285,16 +258,7 @@ sign_in() {
 		return $EX_USAGE
 	fi
 
-	# エコーバックを停止させる
-	old_config=$(stty -g)
-	stty -echo
-
-	printf %s 'Enter your passphrase (invisible): '
-	IFS= read -r passphrase
-	echo
-
-	# エコーバックを再開させる
-	stty "$old_config"
+	ask_passphrase 'Enter your passphrase (invisible): ' passphrase
 
 	salt=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f1)
 	passphrase_hmac=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f2)
@@ -307,6 +271,29 @@ sign_in() {
 
 	copy_password "$service_name" "$your_id" "$passphrase"
 	echo_info 'Your password is stored in the clipboard.'
+}
+
+#
+# ask_passphrase <prompt> <var_name>
+#
+ask_passphrase() {
+	if ! [ $# -eq 2 ]; then
+		return $EX_USAGE
+	fi
+
+	prompt=$1 && shift
+	var_name=$1 && shift
+
+	# エコーバックを停止させる
+	old_config=$(stty -g)
+	stty -echo
+
+	printf %s "$prompt"
+	IFS= read -r "$var_name"
+	echo
+
+	# エコーバックを再開させる
+	stty "$old_config"
 }
 
 #
@@ -326,16 +313,7 @@ sign_migrate() {
 	salt=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f1)
 	old_passphrase_hmac=$(cat "$SIGN_CONFIG_DIR/passphrase_hmac" | cut -f2)
 
-	# エコーバックを停止させる
-	old_config=$(stty -g)
-	stty -echo
-
-	printf %s 'Enter your old passphrase (invisible): '
-	IFS= read -r old_passphrase
-	echo
-
-	# エコーバックを再開させる
-	stty "$old_config"
+	ask_passphrase 'Enter your old passphrase (invisible): ' old_passphrase
 
 	# old_passphrase が誤っている場合
 	if [ $(hmac_sha256 "$salt" "$old_passphrase") != "$old_passphrase_hmac" ]; then
@@ -343,20 +321,8 @@ sign_migrate() {
 		return $EX_USAGE
 	fi
 
-	# エコーバックを停止させる
-	old_config=$(stty -g)
-	stty -echo
-
-	printf %s 'Enter your new passphrase (invisible): '
-	IFS= read -r new_passphrase
-	echo
-
-	printf %s 'Enter your new passphrase again (invisible): '
-	IFS= read -r new_passphrase_again
-	echo
-
-	# エコーバックを再開させる
-	stty "$old_config"
+	ask_passphrase 'Enter your new passphrase (invisible): ' new_passphrase
+	ask_passphrase 'Enter your new passphrase again (invisible): ' new_passphrase_again
 
 	if [ "$new_passphrase" != "$new_passphrase_again" ]; then
 		echo_fatal 'New passphrases do not match.' >&2

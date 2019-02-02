@@ -160,8 +160,6 @@ sign_init() {
 # sign_up <service name> <your ID>
 #
 sign_up() {
-	unset service_name your_id
-
 	if ! [ $# -eq 2 ]; then
 		echo 'Usage:  sign up <service name> <your ID>'
 		return $EX_USAGE
@@ -243,8 +241,6 @@ sign_up() {
 # sign_in <service name> <your ID>
 #
 sign_in() {
-	unset service_name your_id
-
 	if ! [ $# -eq 2 ]; then
 		echo 'Usage:  sign in <service name> <your ID>'
 		return $EX_USAGE

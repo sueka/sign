@@ -20,6 +20,7 @@ fi
 LF='
 '
 
+# /usr/include/sysexits.h
 EX_OK=0
 EX_USAGE=64
 EX_DATAERR=65

@@ -213,7 +213,7 @@ sign_up() {
 			return $EX_USAGE
 		fi
 
-		if ! ([ 1 -le "$password_length" ] && [ "$password_length" -le 43 ]); then
+		if ! { [ 1 -le "$password_length" ] && [ "$password_length" -le 43 ]; } then
 			echo_fatal 'The password length must be between 1 and 43.'
 			return $EX_USAGE
 		fi

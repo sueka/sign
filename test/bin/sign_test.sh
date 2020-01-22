@@ -57,9 +57,9 @@ check_dependencies() {
 }
 
 #
-# ensure_dependencies
+# ensure_suts
 #
-ensure_dependencies() {
+ensure_suts() {
 	. "$PROJECT_ROOT_DIR/bin/sign.sh"
 }
 
@@ -495,13 +495,13 @@ echo_indented() {
 case "$NAME" in
 	sign_test.sh )
 		check_dependencies
-		ensure_dependencies
+		ensure_suts
 		test "$@"
 	;;
 
 	sign_test_test.sh )
 		check_dependencies
-		ensure_dependencies
+		ensure_suts
 	;;
 
 	* )
